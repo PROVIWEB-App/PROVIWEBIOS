@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>475963980955-1q62qiiki0fkasdsvhpikgdgp5r00vto.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.475963980955-1q62qiiki0fkasdsvhpikgdgp5r00vto</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>475963980955-n1hgjb6fum2qp9siaokt20v0koqp6hj1.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBLRhWQr807EVyiCKwCcyLQqNBoxDWYRL8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>475963980955</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.israviolink.ios</string>
+	<key>PROJECT_ID</key>
+	<string>proviweb-d8764</string>
+	<key>STORAGE_BUCKET</key>
+	<string>proviweb-d8764.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:475963980955:ios:2441bbe38752b18c8e1a3e</string>
+	<key>DATABASE_URL</key>
+	<string>https://proviweb-d8764-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

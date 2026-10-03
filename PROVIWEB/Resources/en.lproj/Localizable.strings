@@ -1,0 +1,97 @@
+/* 
+  Localizable.strings (English)
+  PROVIWEB iOS
+*/
+
+"app_name" = "PROVIWEB";
+"welcome_back" = "Welcome to PROVIWEB";
+"home" = "Home";
+"reels" = "Reels";
+"chat" = "Messages";
+"profile" = "Profile";
+"create" = "Create";
+
+/* Top Bar & Feed */
+"live_practice" = "Live";
+"search_hint" = "Search artists, songs, sheet music...";
+"entities_title" = "Verified Entities & Orchestras";
+"recent_books" = "Recent Methods & Scores";
+"community_books" = "Community Sheet Music Library";
+"featured_songs" = "Featured Songs";
+"job_board" = "Musical Job Board";
+"no_posts_yet" = "No posts yet. Be the first to share!";
+
+/* Actions & Create Sheet */
+"post" = "Post";
+"reel" = "Musical Reel";
+"ai_professor" = "AI Professor";
+"practice" = "Practice Studio";
+"meeting" = "Meeting / Masterclass";
+"podcast" = "Podcast";
+"sell_product" = "Sell Instrument / Service";
+"hire_musicians" = "Hire Bands & Ensembles";
+"pages" = "Artist Pages";
+"invite_earn" = "Invite & Earn";
+"promotions" = "Promotions";
+
+/* Post details */
+"likes" = "Likes";
+"comments" = "Comments";
+"shares" = "Shares";
+"feeling" = "Feeling";
+"location" = "Location";
+"type_comment" = "Type a comment...";
+"publish" = "Publish";
+"time_practiced" = "Time Practiced:";
+
+/* AI Professor */
+"ai_professor_title" = "AI Violin & Music Professor";
+"start_session" = "Start Guided Practice";
+"stop_session" = "End Practice";
+"posture_score" = "Posture";
+"pitch_accuracy" = "Pitch Accuracy";
+"tempo_bpm" = "Tempo";
+"detected_note" = "Detected Note";
+"tuning_perfect" = "Perfect Pitch!";
+"tuning_sharp" = "Too High (Sharp)";
+"tuning_flat" = "Too Low (Flat)";
+"ask_maestro" = "Ask Maestro AI...";
+
+/* Music Player */
+"music_player" = "Player";
+"explore_music" = "Explore Songs";
+"create_playlist" = "New Playlist";
+"upload_song" = "Upload Song";
+"genres_classical" = "Classical Music";
+"genres_mariachi" = "Mariachi";
+"genres_banda" = "Sinaloan Banda";
+"genres_jazz" = "Jazz";
+"genres_vocal" = "Vocal / Lyric Singing";
+
+/* Practice Studio */
+"metronome" = "Metronome";
+"chromatic_tuner" = "Chromatic Tuner";
+"practice_reward_earned" = "You earned $1.00 for practicing over 200 seconds!";
+
+/* Marketplace & Quotes */
+"marketplace" = "Music Marketplace";
+"nearby_musicians" = "Musicians Near You";
+"request_quote" = "Request Quote";
+"event_date" = "Event Date";
+"budget" = "Estimated Budget";
+
+/* QAV Wallet */
+"qav_wallet" = "QAV Wallet";
+"balance" = "Available Balance";
+"diamonds" = "Diamonds";
+"withdraw" = "Withdraw Funds";
+"connect_wallet" = "Connect Web3 Wallet";
+"scan_qr" = "Scan QR Code";
+
+/* Common */
+"cancel" = "Cancel";
+"accept" = "Accept";
+"save" = "Save";
+"delete" = "Delete";
+"loading" = "Loading...";
+"error" = "An error occurred";

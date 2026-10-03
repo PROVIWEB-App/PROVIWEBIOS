@@ -1,0 +1,97 @@
+/* 
+  Localizable.strings (Español)
+  PROVIWEB iOS
+*/
+
+"app_name" = "PROVIWEB";
+"welcome_back" = "Bienvenido a PROVIWEB";
+"home" = "Inicio";
+"reels" = "Reels";
+"chat" = "Mensajes";
+"profile" = "Perfil";
+"create" = "Crear";
+
+/* Top Bar & Feed */
+"live_practice" = "En Vivo";
+"search_hint" = "Buscar artistas, canciones, partituras...";
+"entities_title" = "Entidades y Orquestas Verificadas";
+"recent_books" = "Métodos y Partituras Recientes";
+"community_books" = "Biblioteca de la Comunidad";
+"featured_songs" = "Canciones Destacadas";
+"job_board" = "Bolsa de Empleo Musical";
+"no_posts_yet" = "No hay publicaciones aún. ¡Sé el primero en compartir!";
+
+/* Actions & Create Sheet */
+"post" = "Publicación";
+"reel" = "Reel Musical";
+"ai_professor" = "Profesor IA";
+"practice" = "Estudio de Práctica";
+"meeting" = "Reunión / Masterclass";
+"podcast" = "Podcast";
+"sell_product" = "Vender Instrumento / Servicio";
+"hire_musicians" = "Cotizar Agrupaciones";
+"pages" = "Páginas de Artista";
+"invite_earn" = "Invitar y Ganar";
+"promotions" = "Promocionar";
+
+/* Post details */
+"likes" = "Me gusta";
+"comments" = "Comentarios";
+"shares" = "Compartir";
+"feeling" = "Me siento";
+"location" = "Ubicación";
+"type_comment" = "Escribe un comentario...";
+"publish" = "Publicar";
+"time_practiced" = "Tiempo Practicado:";
+
+/* AI Professor */
+"ai_professor_title" = "Profesor IA de Violín y Música";
+"start_session" = "Iniciar Práctica Guiada";
+"stop_session" = "Finalizar Práctica";
+"posture_score" = "Postura";
+"pitch_accuracy" = "Afinación";
+"tempo_bpm" = "Tempo";
+"detected_note" = "Nota Detectada";
+"tuning_perfect" = "¡Afinación Perfecta!";
+"tuning_sharp" = "Demasiado Alto (Sostenido)";
+"tuning_flat" = "Demasiado Bajo (Bemol)";
+"ask_maestro" = "Preguntar al Maestro IA...";
+
+/* Music Player */
+"music_player" = "Reproductor";
+"explore_music" = "Explorar Canciones";
+"create_playlist" = "Nueva Playlist";
+"upload_song" = "Subir Canción";
+"genres_classical" = "Música Clásica";
+"genres_mariachi" = "Mariachi";
+"genres_banda" = "Banda Sinaloense";
+"genres_jazz" = "Jazz";
+"genres_vocal" = "Canto Lírico / Vocal";
+
+/* Practice Studio */
+"metronome" = "Metrónomo";
+"chromatic_tuner" = "Afinador Cromático";
+"practice_reward_earned" = "¡Has ganado $1.00 por practicar más de 200 segundos!";
+
+/* Marketplace & Quotes */
+"marketplace" = "Marketplace Musical";
+"nearby_musicians" = "Músicos Cerca de Ti";
+"request_quote" = "Solicitar Cotización";
+"event_date" = "Fecha del Evento";
+"budget" = "Presupuesto Estimado";
+
+/* QAV Wallet */
+"qav_wallet" = "Monedero QAV";
+"balance" = "Saldo Disponible";
+"diamonds" = "Diamantes";
+"withdraw" = "Retirar Fondos";
+"connect_wallet" = "Conectar Wallet Web3";
+"scan_qr" = "Escanear Código QR";
+
+/* Common */
+"cancel" = "Cancelar";
+"accept" = "Aceptar";
+"save" = "Guardar";
+"delete" = "Eliminar";
+"loading" = "Cargando...";
+"error" = "Ha ocurrido un error";

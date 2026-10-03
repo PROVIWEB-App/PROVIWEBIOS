@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROVIWEB iOS — Simulador Interactivo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1877F2;
+            --primary-dark: #0D47A1;
+            --chat-primary: #0A6BFF;
+            --music-primary: #2196F3;
+            --gold: #FFD700;
+            --bg-color: #0F0F12;
+            --card-bg: #1A1A1E;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #141E30, #243B55);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .simulator-container {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .info-panel {
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .info-panel h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-panel p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(24, 119, 242, 0.2);
+            color: #4da3ff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .instructions-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .instructions-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 14px;
+            border-radius: 12px;
+        }
+
+        .instructions-list i {
+            color: var(--gold);
+        }
+
+        /* iPhone Frame */
+        .iphone-frame {
+            width: 390px;
+            height: 800px;
+            background: #000;
+            border-radius: 54px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 12px #2d2d30, 0 0 0 14px #444;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 115px;
+            height: 30px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            color: #fff;
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .screen-content {
+            flex: 1;
+            background: var(--bg-color);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 48px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        /* Top Bar */
+        .app-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 18px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-logo {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .live-tag {
+            background: #FF3B30;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #FF3B30;
+            border-radius: 50%;
+            position: absolute;
+            top: -2px;
+            right: -2px;
+        }
+
+        /* Stories / Live Carousel */
+        .stories-bar {
+            display: flex;
+            gap: 14px;
+            padding: 14px 18px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .story-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--bg-color);
+            object-fit: cover;
+        }
+
+        .story-name {
+            font-size: 11px;
+            color: var(--text-primary);
+            max-width: 60px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Post Card */
+        .post-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 16px;
+            margin: 12px 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .post-user-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .post-user-info span {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .post-text {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .audio-snippet {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(24, 119, 242, 0.12);
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .play-audio-btn {
+            background: var(--primary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 20px;
+            flex: 1;
+        }
+
+        .wave-bar {
+            width: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .action-btn.liked {
+            color: #FF3B30;
+        }
+
+        /* Floating Mini Player */
+        .mini-player {
+            position: absolute;
+            bottom: 74px;
+            left: 12px;
+            right: 12px;
+            background: rgba(26, 26, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            z-index: 900;
+            cursor: pointer;
+        }
+
+        .mini-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mini-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .mini-text h5 {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .mini-text p {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .mini-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding-bottom: 10px;
+            z-index: 950;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-item i {
+            font-size: 20px;
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .create-tab-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -20px;
+            box-shadow: 0 6px 16px rgba(24, 119, 242, 0.4);
+            cursor: pointer;
+        }
+
+        /* Modal Overlay */
+        .modal-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-color);
+            z-index: 1100;
+            display: none;
+            flex-direction: column;
+            padding-top: 48px;
+            animation: slideUp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="simulator-container">
+    <!-- Info & Test Instructions -->
+    <div class="info-panel">
+        <div class="feature-badge"><i class="fab fa-apple"></i> PROVIWEB iOS Nativo</div>
+        <h1>Simulador Interactivo</h1>
+        <p>Prueba en vivo la interfaz, audio, afinador, metrónomo y navegación de <strong>PROVIWEBIOS</strong> directamente aquí en tu navegador de Windows.</p>
+        
+        <ul class="instructions-list">
+            <li><i class="fas fa-robot"></i> <strong>Profesor IA:</strong> Toca el icono de cerebro arriba para abrir el tutor de violín.</li>
+            <li><i class="fas fa-play-circle"></i> <strong>Música:</strong> Toca el reproductor mini para escuchar y ver la rotación de vinilo.</li>
+            <li><i class="fas fa-stopwatch"></i> <strong>Estudio:</strong> Toca "En Vivo" para probar el metrónomo interactivo y afinador cromático.</li>
+            <li><i class="fas fa-wallet"></i> <strong>Monedero QAV:</strong> Toca el icono de cartera para ver el saldo y código QR Web3.</li>
+            <li><i class="fas fa-bars"></i> <strong>Menú Completo:</strong> Toca las 3 barras para explorar todas las 13 secciones.</li>
+        </ul>
+    </div>
+
+    <!-- iPhone 15 Frame -->
+    <div class="iphone-frame">
+        <!-- Dynamic Island -->
+        <div class="dynamic-island" id="dynamicIsland">
+            <i class="fas fa-music" style="color: var(--primary);"></i>
+            <span>PROVIWEB</span>
+            <i class="fas fa-wifi" style="font-size: 8px;"></i>
+        </div>
+
+        <!-- Main Screen Content -->
+        <div class="screen-content" id="screenContent">
+            <!-- Top Bar -->
+            <div class="app-topbar">
+                <button class="top-btn" onclick="openModal('menuModal')"><i class="fas fa-bars"></i></button>
+                <div class="app-logo">PROVIWEB</div>
+                <div class="top-actions">
+                    <div class="live-tag" onclick="openModal('practiceModal')">
+                        <span style="font-size: 8px;">●</span> LIVE
+                    </div>
+                    <button class="top-btn" onclick="openModal('aiModal')"><i class="fas fa-brain" style="color: var(--primary);"></i></button>
+                    <button class="top-btn" onclick="openModal('walletModal')"><i class="fas fa-wallet" style="color: var(--gold);"></i></button>
+                    <button class="top-btn" onclick="openModal('notifModal')">
+                        <i class="fas fa-bell"></i>
+                        <div class="badge-dot"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stories Bar -->
+            <div class="stories-bar">
+                <div class="story-item" onclick="openModal('practiceModal')">
+                    <div class="story-avatar" style="background: var(--card-bg); border: 2px dashed var(--primary);">
+                        <i class="fas fa-plus" style="color: var(--primary);"></i>
+                    </div>
+                    <span class="story-name">Tu Sala</span>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Avatar">
+                    </div>
+                    <span class="story-name">Israel Violín</span>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">
+                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150" alt="Avatar">
+                    </div>
+                    <span class="story-name">Mariachi Real</span>
+                </div>
+                <div class="story-item">
+                    <div class="story-avatar">
+                        <img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=150" alt="Avatar">
+                    </div>
+                    <span class="story-name">Filarmónica</span>
+                </div>
+            </div>
+
+            <!-- Post Card 1 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="post-avatar">
+                    <div class="post-user-info">
+                        <h4>Israel Violín Maestro <i class="fas fa-check-circle" style="color: var(--primary);"></i></h4>
+                        <span>Sala Nezahualcóyotl • se siente Inspirado</span>
+                    </div>
+                </div>
+                <div class="post-text">
+                    Trabajando en el Concierto de Mendelssohn en Mi Menor. ¡El Profesor IA me ayudó a calibrar la afinación del tercer movimiento! 🎻✨
+                </div>
+                <img src="https://images.unsplash.com/photo-1612225330812-01a9c6b355ec?w=600" class="post-image">
+                
+                <div class="audio-snippet">
+                    <button class="play-audio-btn" onclick="toggleAudioDemo()"><i class="fas fa-play" id="audioPlayIcon"></i></button>
+                    <div class="waveform">
+                        <div class="wave-bar" style="height: 12px;"></div>
+                        <div class="wave-bar" style="height: 18px;"></div>
+                        <div class="wave-bar" style="height: 8px;"></div>
+                        <div class="wave-bar" style="height: 16px;"></div>
+                        <div class="wave-bar" style="height: 14px;"></div>
+                        <div class="wave-bar" style="height: 20px;"></div>
+                        <div class="wave-bar" style="height: 10px;"></div>
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-secondary);">Mendelssohn.mp3</span>
+                </div>
+
+                <div class="post-actions">
+                    <button class="action-btn" onclick="toggleLike(this)"><i class="far fa-heart"></i> 148</button>
+                    <button class="action-btn" onclick="alert('Comentarios en tiempo real conectados con Firebase.')"><i class="far fa-comment"></i> 24</button>
+                    <button class="action-btn"><i class="far fa-share-square"></i> Compartir</button>
+                    <button class="action-btn"><i class="far fa-bookmark"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Mini Player -->
+        <div class="mini-player" onclick="openModal('musicPlayerModal')">
+            <div class="mini-info">
+                <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=100" class="mini-thumb">
+                <div class="mini-text">
+                    <h5>Czardas de Monti</h5>
+                    <p>Israel Violín Maestro</p>
+                </div>
+            </div>
+            <div class="mini-controls">
+                <i class="fas fa-play" style="color: #fff; font-size: 16px;"></i>
+                <i class="fas fa-step-forward" style="color: var(--text-secondary); font-size: 14px;"></i>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-item active"><i class="fas fa-home"></i> Inicio</button>
+            <button class="tab-item" onclick="openModal('reelsModal')"><i class="fas fa-film"></i> Reels</button>
+            <button class="create-tab-btn" onclick="openModal('createModal')"><i class="fas fa-plus"></i></button>
+            <button class="tab-item" onclick="openModal('chatModal')"><i class="fas fa-comments"></i> Mensajes</button>
+            <button class="tab-item" onclick="openModal('profileModal')"><i class="fas fa-user"></i> Perfil</button>
+        </div>
+
+        <!-- MODAL: AI Professor -->
+        <div class="modal-view" id="aiModal">
+            <div class="modal-header">
+                <h3>Profesor IA de Violín</h3>
+                <button class="close-modal-btn" onclick="closeModal('aiModal')">Cerrar</button>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+                <div style="width: 100%; height: 220px; background: #000; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                    <i class="fas fa-walking" style="font-size: 48px; color: var(--primary);"></i>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 10px;">Rastreo de postura y arco con Apple Vision</p>
+                    <div style="position: absolute; bottom: 10px; display: flex; gap: 10px;">
+                        <span style="background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 8px; font-size: 11px; color: #4BB543;">Afinación: 96%</span>
+                        <span style="background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 8px; font-size: 11px; color: var(--primary);">Postura: 94%</span>
+                    </div>
+                </div>
+                <div style="background: var(--card-bg); padding: 16px; border-radius: 16px; margin-top: 16px; text-align: left;">
+                    <div style="font-size: 12px; color: var(--text-secondary);">Afinador en Tiempo Real</div>
+                    <div style="font-size: 32px; font-weight: 900; color: var(--primary); margin: 6px 0;">La (A4) - 440.0 Hz</div>
+                    <div style="color: #4BB543; font-size: 12px; font-weight: 700;">● Afinación Perfecta</div>
+                </div>
+                <div style="background: var(--card-bg); padding: 16px; border-radius: 16px; margin-top: 16px; text-align: left; display: flex; gap: 12px;">
+                    <i class="fas fa-brain" style="color: var(--primary); font-size: 24px;"></i>
+                    <p style="font-size: 13px; line-height: 1.4;"><strong>Maestro IA:</strong> "Excelente ángulo de muñeca. Mantén la velocidad constante en el talón del arco."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Practice Studio -->
+        <div class="modal-view" id="practiceModal">
+            <div class="modal-header">
+                <h3>Estudio de Práctica</h3>
+                <button class="close-modal-btn" onclick="closeModal('practiceModal')">Cerrar</button>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 20px;">
+                    <span style="font-size: 12px; color: var(--text-secondary);">Tiempo de Práctica Acumulado</span>
+                    <div style="font-size: 42px; font-weight: 900; color: var(--primary); font-family: monospace; margin: 8px 0;" id="practiceTimer">00:03:25</div>
+                    <span style="font-size: 12px; color: #4BB543; font-weight: 700;">✓ +$1.00 USD Ganado por >200s</span>
+                </div>
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 20px; margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700;">Metrónomo Digital</span>
+                        <span style="font-size: 18px; font-weight: 900; color: var(--primary);" id="bpmDisplay">120 BPM</span>
+                    </div>
+                    <button style="margin-top: 16px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 24px; cursor: pointer;" onclick="toggleMetronome(this)"><i class="fas fa-play"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: QAV Wallet -->
+        <div class="modal-view" id="walletModal">
+            <div class="modal-header">
+                <h3>Monedero QAV & Web3</h3>
+                <button class="close-modal-btn" onclick="closeModal('walletModal')">Cerrar</button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 24px; border-radius: 20px; text-align: center;">
+                    <span style="font-size: 12px; color: rgba(255,255,255,0.8);">Saldo Disponible</span>
+                    <div style="font-size: 38px; font-weight: 900; margin: 8px 0;">$145.50 USD</div>
+                    <span style="font-size: 13px; color: var(--gold); font-weight: 700;">💎 820 Diamantes • 14 Referidos</span>
+                </div>
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 20px; margin-top: 16px; text-align: center;">
+                    <h4 style="font-size: 14px; margin-bottom: 12px;">Tu Dirección Web3</h4>
+                    <div style="background: #fff; padding: 12px; border-radius: 12px; display: inline-block;">
+                        <i class="fas fa-qrcode" style="font-size: 100px; color: #000;"></i>
+                    </div>
+                    <p style="font-size: 11px; font-family: monospace; color: var(--text-secondary); margin-top: 10px;">0x71C8364379963282b0bB39d91D3488734024982a</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Side Menu -->
+        <div class="modal-view" id="menuModal">
+            <div class="modal-header">
+                <h3>Menú PROVIWEB</h3>
+                <button class="close-modal-btn" onclick="closeModal('menuModal')">Cerrar</button>
+            </div>
+            <div style="padding: 16px;">
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 8px;">
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('practiceModal');">
+                        <i class="fas fa-music" style="color: var(--music-primary);"></i> Explorar Música y Playlists
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Reto de Acordes y Entrenamiento Auditivo.');">
+                        <i class="fas fa-gamecontroller" style="color: var(--gold);"></i> Juegos Musicales & Oído
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Cotizador de Mariachis y Bandas.');">
+                        <i class="fas fa-bullhorn" style="color: orange;"></i> Cotizaciones de Agrupaciones
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Programa de Embajadores ($0.50 USD por artista).');">
+                        <i class="fas fa-gift" style="color: #4BB543;"></i> Invitar Artistas y Ganar
+                    </div>
+                    <div style="padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Panel de Administración y Revisión de Derechos.');">
+                        <i class="fas fa-shield-alt" style="color: #9C27B0;"></i> Panel de Administración
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function toggleLike(btn) {
+        btn.classList.toggle('liked');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('liked')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            btn.innerHTML = '<i class="fas fa-heart"></i> 149';
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            btn.innerHTML = '<i class="far fa-heart"></i> 148';
+        }
+    }
+
+    let audioContext = null;
+    let metronomeInterval = null;
+    let isMetronomeRunning = false;
+
+    function toggleMetronome(btn) {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        isMetronomeRunning = !isMetronomeRunning;
+        if (isMetronomeRunning) {
+            btn.innerHTML = '<i class="fas fa-stop"></i>';
+            btn.style.background = '#FF3B30';
+            metronomeInterval = setInterval(() => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.frequency.value = 880;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.05);
+            }, 500); // 120 BPM
+        } else {
+            btn.innerHTML = '<i class="fas fa-play"></i>';
+            btn.style.background = 'var(--primary)';
+            clearInterval(metronomeInterval);
+        }
+    }
+
+    function toggleAudioDemo() {
+        const icon = document.getElementById('audioPlayIcon');
+        if (icon.classList.contains('fa-play')) {
+            icon.classList.remove('fa-play');
+            icon.classList.add('fa-pause');
+        } else {
+            icon.classList.remove('fa-pause');
+            icon.classList.add('fa-play');
+        }
+    }
+</script>
+
+</body>
+</html>

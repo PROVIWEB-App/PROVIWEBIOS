@@ -1,0 +1,694 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10001 /* PROVIWEBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10001 /* PROVIWEBApp.swift */; };
+		A10002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10002 /* AppDelegate.swift */; };
+		A10003 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003 /* AppTheme.swift */; };
+		A10004 /* FirebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10004 /* FirebaseService.swift */; };
+		A10005 /* AudioPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10005 /* AudioPlayerService.swift */; };
+		A10006 /* MetronomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10006 /* MetronomeService.swift */; };
+		A10007 /* PoseEstimationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10007 /* PoseEstimationService.swift */; };
+		A10008 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008 /* LocationService.swift */; };
+		A10009 /* Web3WalletService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10009 /* Web3WalletService.swift */; };
+		A10010 /* CallKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10010 /* CallKitService.swift */; };
+		A10011 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10011 /* UserModel.swift */; };
+		A10012 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10012 /* PostModel.swift */; };
+		A10013 /* SongModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10013 /* SongModel.swift */; };
+		A10014 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10014 /* ChatModel.swift */; };
+		A10015 /* AIProfessorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10015 /* AIProfessorModel.swift */; };
+		A10016 /* HomeFeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10016 /* HomeFeedViewModel.swift */; };
+		A10017 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10017 /* ChatViewModel.swift */; };
+		A10018 /* MarketplaceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10018 /* MarketplaceViewModel.swift */; };
+		A10019 /* PostCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10019 /* PostCardView.swift */; };
+		A10020 /* MusicPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10020 /* MusicPlayerView.swift */; };
+		A10021 /* AIProfessorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10021 /* AIProfessorView.swift */; };
+		A10022 /* ReelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10022 /* ReelsView.swift */; };
+		A10023 /* ChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10023 /* ChatListView.swift */; };
+		A10024 /* PracticeStudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10024 /* PracticeStudioView.swift */; };
+		A10025 /* MarketplaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10025 /* MarketplaceView.swift */; };
+		A10026 /* QAVWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10026 /* QAVWalletView.swift */; };
+		A10027 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10027 /* ProfileView.swift */; };
+		A10028 /* CreateModalSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10028 /* CreateModalSheet.swift */; };
+		A10029 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10029 /* HomeView.swift */; };
+		A10030 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10030 /* MainTabView.swift */; };
+		A10031 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10031 /* LoginView.swift */; };
+		A10032 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10032 /* Assets.xcassets */; };
+		A10033 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B10033 /* GoogleService-Info.plist */; };
+		A10034 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B10034 /* Localizable.strings */; };
+		A10035 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10036 /* AnalyticsService.swift */; };
+		A10036 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10037 /* NetworkMonitor.swift */; };
+		A10037 /* InAppReviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10038 /* InAppReviewService.swift */; };
+		A10038 /* MusicExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10039 /* MusicExploreView.swift */; };
+		A10039 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10040 /* NotificationsView.swift */; };
+		A10040 /* InviteEarnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10041 /* InviteEarnView.swift */; };
+		A10041 /* MusicalGamesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10042 /* MusicalGamesView.swift */; };
+		A10042 /* AdminDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10043 /* AdminDashboardView.swift */; };
+		A10043 /* ArtistPagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10044 /* ArtistPagesView.swift */; };
+		A10044 /* LiveMeetingRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10045 /* LiveMeetingRoomView.swift */; };
+		A10045 /* SideDrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10046 /* SideDrawerView.swift */; };
+		A10046 /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10047 /* DateUtils.swift */; };
+		A10047 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10048 /* QRScannerView.swift */; };
+		A10048 /* MediaViewerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10049 /* MediaViewerModal.swift */; };
+		A10049 /* AdsManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10050 /* AdsManagerView.swift */; };
+		A10050 /* JobBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10051 /* JobBoardView.swift */; };
+		A10051 /* DetailPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10052 /* DetailPostView.swift */; };
+		A10052 /* VideoSeriesPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10053 /* VideoSeriesPlayerView.swift */; };
+		A10053 /* BookingCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10054 /* BookingCalendarView.swift */; };
+		A10054 /* DiamondWithdrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10055 /* DiamondWithdrawView.swift */; };
+		A10055 /* SoundEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10056 /* SoundEffectManager.swift */; };
+		A10056 /* UploadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10057 /* UploadManager.swift */; };
+		A10057 /* WaitApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10058 /* WaitApprovalView.swift */; };
+		A10058 /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10059 /* AchievementsView.swift */; };
+		A10059 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B10060 /* LaunchScreen.storyboard */; };
+		A10060 /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = B10061 /* Sounds */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B10000 /* PROVIWEB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PROVIWEB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10001 /* PROVIWEBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PROVIWEBApp.swift; sourceTree = "<group>"; };
+		B10002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B10003 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		B10004 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
+		B10005 /* AudioPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerService.swift; sourceTree = "<group>"; };
+		B10006 /* MetronomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetronomeService.swift; sourceTree = "<group>"; };
+		B10007 /* PoseEstimationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseEstimationService.swift; sourceTree = "<group>"; };
+		B10008 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		B10009 /* Web3WalletService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Web3WalletService.swift; sourceTree = "<group>"; };
+		B10010 /* CallKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitService.swift; sourceTree = "<group>"; };
+		B10011 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		B10012 /* PostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostModel.swift; sourceTree = "<group>"; };
+		B10013 /* SongModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongModel.swift; sourceTree = "<group>"; };
+		B10014 /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
+		B10015 /* AIProfessorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIProfessorModel.swift; sourceTree = "<group>"; };
+		B10016 /* HomeFeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedViewModel.swift; sourceTree = "<group>"; };
+		B10017 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		B10018 /* MarketplaceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceViewModel.swift; sourceTree = "<group>"; };
+		B10019 /* PostCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCardView.swift; sourceTree = "<group>"; };
+		B10020 /* MusicPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerView.swift; sourceTree = "<group>"; };
+		B10021 /* AIProfessorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIProfessorView.swift; sourceTree = "<group>"; };
+		B10022 /* ReelsView.swift in Sources */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelsView.swift; sourceTree = "<group>"; };
+		B10023 /* ChatListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListView.swift; sourceTree = "<group>"; };
+		B10024 /* PracticeStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeStudioView.swift; sourceTree = "<group>"; };
+		B10025 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceView.swift; sourceTree = "<group>"; };
+		B10026 /* QAVWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QAVWalletView.swift; sourceTree = "<group>"; };
+		B10027 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		B10028 /* CreateModalSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateModalSheet.swift; sourceTree = "<group>"; };
+		B10029 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		B10030 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		B10031 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		B10032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B10033 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Config/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B10034 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "Localizable.strings"; path = "Resources/es.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B10035 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Config/Info.plist"; sourceTree = "<group>"; };
+		B10036 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		B10037 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		B10038 /* InAppReviewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppReviewService.swift; sourceTree = "<group>"; };
+		B10039 /* MusicExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicExploreView.swift; sourceTree = "<group>"; };
+		B10040 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		B10041 /* InviteEarnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteEarnView.swift; sourceTree = "<group>"; };
+		B10042 /* MusicalGamesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicalGamesView.swift; sourceTree = "<group>"; };
+		B10043 /* AdminDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminDashboardView.swift; sourceTree = "<group>"; };
+		B10044 /* ArtistPagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistPagesView.swift; sourceTree = "<group>"; };
+		B10045 /* LiveMeetingRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMeetingRoomView.swift; sourceTree = "<group>"; };
+		B10046 /* SideDrawerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideDrawerView.swift; sourceTree = "<group>"; };
+		B10047 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
+		B10048 /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
+		B10049 /* MediaViewerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaViewerModal.swift; sourceTree = "<group>"; };
+		B10050 /* AdsManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdsManagerView.swift; sourceTree = "<group>"; };
+		B10051 /* JobBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobBoardView.swift; sourceTree = "<group>"; };
+		B10052 /* DetailPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPostView.swift; sourceTree = "<group>"; };
+		B10053 /* VideoSeriesPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSeriesPlayerView.swift; sourceTree = "<group>"; };
+		B10054 /* BookingCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookingCalendarView.swift; sourceTree = "<group>"; };
+		B10055 /* DiamondWithdrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiamondWithdrawView.swift; sourceTree = "<group>"; };
+		B10056 /* SoundEffectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEffectManager.swift; sourceTree = "<group>"; };
+		B10057 /* UploadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadManager.swift; sourceTree = "<group>"; };
+		B10058 /* WaitApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitApprovalView.swift; sourceTree = "<group>"; };
+		B10059 /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
+		B10060 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Resources/LaunchScreen.storyboard"; sourceTree = "<group>"; };
+		B10061 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Resources/Sounds"; sourceTree = "<group>"; };
+		B10062 /* PROVIWEB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Config/PROVIWEB.entitlements"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C10001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D10001 = {
+			isa = PBXGroup;
+			children = (
+				D10002 /* PROVIWEB */,
+				D10003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D10002 /* PROVIWEB */ = {
+			isa = PBXGroup;
+			children = (
+				D10004 /* App */,
+				D10005 /* Core */,
+				D10006 /* Models */,
+				D10007 /* ViewModels */,
+				D10008 /* Views */,
+				D10009 /* Config */,
+				D10010 /* Resources */,
+				B10032 /* Assets.xcassets */,
+			);
+			path = PROVIWEB;
+			sourceTree = "<group>";
+		};
+		D10003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B10000 /* PROVIWEB.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D10004 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B10001 /* PROVIWEBApp.swift */,
+				B10002 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		D10005 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				D10011 /* Theme */,
+				D10012 /* Network */,
+				D10013 /* Audio */,
+				D10014 /* Vision */,
+				D10015 /* Location */,
+				D10016 /* Web3 */,
+				D10017 /* Calling */,
+				D10018 /* Utils */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		D10011 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				B10003 /* AppTheme.swift */,
+				B10038 /* InAppReviewService.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		D10012 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				B10004 /* FirebaseService.swift */,
+				B10036 /* AnalyticsService.swift */,
+				B10037 /* NetworkMonitor.swift */,
+				B10057 /* UploadManager.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		D10013 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				B10005 /* AudioPlayerService.swift */,
+				B10006 /* MetronomeService.swift */,
+				B10056 /* SoundEffectManager.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		D10014 /* Vision */ = {
+			isa = PBXGroup;
+			children = (
+				B10007 /* PoseEstimationService.swift */,
+			);
+			path = Vision;
+			sourceTree = "<group>";
+		};
+		D10015 /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				B10008 /* LocationService.swift */,
+			);
+			path = Location;
+			sourceTree = "<group>";
+		};
+		D10016 /* Web3 */ = {
+			isa = PBXGroup;
+			children = (
+				B10009 /* Web3WalletService.swift */,
+			);
+			path = Web3;
+			sourceTree = "<group>";
+		};
+		D10017 /* Calling */ = {
+			isa = PBXGroup;
+			children = (
+				B10010 /* CallKitService.swift */,
+			);
+			path = Calling;
+			sourceTree = "<group>";
+		};
+		D10018 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B10047 /* DateUtils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		D10006 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B10011 /* UserModel.swift */,
+				B10012 /* PostModel.swift */,
+				B10013 /* SongModel.swift */,
+				B10014 /* ChatModel.swift */,
+				B10015 /* AIProfessorModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D10007 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				B10016 /* HomeFeedViewModel.swift */,
+				B10017 /* ChatViewModel.swift */,
+				B10018 /* MarketplaceViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D10008 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B10019 /* PostCardView.swift */,
+				B10020 /* MusicPlayerView.swift */,
+				B10021 /* AIProfessorView.swift */,
+				B10022 /* ReelsView.swift */,
+				B10023 /* ChatListView.swift */,
+				B10024 /* PracticeStudioView.swift */,
+				B10025 /* MarketplaceView.swift */,
+				B10026 /* QAVWalletView.swift */,
+				B10027 /* ProfileView.swift */,
+				B10028 /* CreateModalSheet.swift */,
+				B10029 /* HomeView.swift */,
+				B10030 /* MainTabView.swift */,
+				B10031 /* LoginView.swift */,
+				B10039 /* MusicExploreView.swift */,
+				B10040 /* NotificationsView.swift */,
+				B10041 /* InviteEarnView.swift */,
+				B10042 /* MusicalGamesView.swift */,
+				B10043 /* AdminDashboardView.swift */,
+				B10044 /* ArtistPagesView.swift */,
+				B10045 /* LiveMeetingRoomView.swift */,
+				B10046 /* SideDrawerView.swift */,
+				B10048 /* QRScannerView.swift */,
+				B10049 /* MediaViewerModal.swift */,
+				B10050 /* AdsManagerView.swift */,
+				B10051 /* JobBoardView.swift */,
+				B10052 /* DetailPostView.swift */,
+				B10053 /* VideoSeriesPlayerView.swift */,
+				B10054 /* BookingCalendarView.swift */,
+				B10055 /* DiamondWithdrawView.swift */,
+				B10058 /* WaitApprovalView.swift */,
+				B10059 /* AchievementsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D10009 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				B10033 /* GoogleService-Info.plist */,
+				B10035 /* Info.plist */,
+				B10062 /* PROVIWEB.entitlements */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		D10010 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B10034 /* Localizable.strings */,
+				B10060 /* LaunchScreen.storyboard */,
+				B10061 /* Sounds */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E10001 /* PROVIWEB */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F10001 /* Build configuration list for PBXNativeTarget "PROVIWEB" */;
+			buildPhases = (
+				C10001 /* Frameworks */,
+				G10001 /* Sources */,
+				H10001 /* Resources */,
+				S10001 /* Crashlytics Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PROVIWEB;
+			packageProductDependencies = (
+				P10001 /* FirebaseAnalytics */,
+				P10002 /* FirebaseCrashlytics */,
+				P10003 /* FirebaseAuth */,
+				P10004 /* FirebaseDatabase */,
+				P10005 /* FirebaseStorage */,
+				P10006 /* FirebaseMessaging */,
+			);
+			productName = PROVIWEB;
+			productReference = B10000 /* PROVIWEB.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		I10001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					E10001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = F10002 /* Build configuration list for PBXProject "PROVIWEB" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				es,
+				en,
+				Base,
+			);
+			mainGroup = D10001;
+			packageReferences = (
+				R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			productRefGroup = D10003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E10001 /* PROVIWEB */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		H10001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10032 /* Assets.xcassets in Resources */,
+				A10033 /* GoogleService-Info.plist in Resources */,
+				A10034 /* Localizable.strings in Resources */,
+				A10059 /* LaunchScreen.storyboard in Resources */,
+				A10060 /* Sounds in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		S10001 /* Crashlytics Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/PROVIWEB/Config/GoogleService-Info.plist",
+			);
+			name = "Upload dSYMs to Firebase Crashlytics";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		G10001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10001 /* PROVIWEBApp.swift in Sources */,
+				A10002 /* AppDelegate.swift in Sources */,
+				A10003 /* AppTheme.swift in Sources */,
+				A10004 /* FirebaseService.swift in Sources */,
+				A10005 /* AudioPlayerService.swift in Sources */,
+				A10006 /* MetronomeService.swift in Sources */,
+				A10007 /* PoseEstimationService.swift in Sources */,
+				A10008 /* LocationService.swift in Sources */,
+				A10009 /* Web3WalletService.swift in Sources */,
+				A10010 /* CallKitService.swift in Sources */,
+				A10011 /* UserModel.swift in Sources */,
+				A10012 /* PostModel.swift in Sources */,
+				A10013 /* SongModel.swift in Sources */,
+				A10014 /* ChatModel.swift in Sources */,
+				A10015 /* AIProfessorModel.swift in Sources */,
+				A10016 /* HomeFeedViewModel.swift in Sources */,
+				A10017 /* ChatViewModel.swift in Sources */,
+				A10018 /* MarketplaceViewModel.swift in Sources */,
+				A10019 /* PostCardView.swift in Sources */,
+				A10020 /* MusicPlayerView.swift in Sources */,
+				A10021 /* AIProfessorView.swift in Sources */,
+				A10022 /* ReelsView.swift in Sources */,
+				A10023 /* ChatListView.swift in Sources */,
+				A10024 /* PracticeStudioView.swift in Sources */,
+				A10025 /* MarketplaceView.swift in Sources */,
+				A10026 /* QAVWalletView.swift in Sources */,
+				A10027 /* ProfileView.swift in Sources */,
+				A10028 /* CreateModalSheet.swift in Sources */,
+				A10029 /* HomeView.swift in Sources */,
+				A10030 /* MainTabView.swift in Sources */,
+				A10031 /* LoginView.swift in Sources */,
+				A10035 /* AnalyticsService.swift in Sources */,
+				A10036 /* NetworkMonitor.swift in Sources */,
+				A10037 /* InAppReviewService.swift in Sources */,
+				A10038 /* MusicExploreView.swift in Sources */,
+				A10039 /* NotificationsView.swift in Sources */,
+				A10040 /* InviteEarnView.swift in Sources */,
+				A10041 /* MusicalGamesView.swift in Sources */,
+				A10042 /* AdminDashboardView.swift in Sources */,
+				A10043 /* ArtistPagesView.swift in Sources */,
+				A10044 /* LiveMeetingRoomView.swift in Sources */,
+				A10045 /* SideDrawerView.swift in Sources */,
+				A10046 /* DateUtils.swift in Sources */,
+				A10047 /* QRScannerView.swift in Sources */,
+				A10048 /* MediaViewerModal.swift in Sources */,
+				A10049 /* AdsManagerView.swift in Sources */,
+				A10050 /* JobBoardView.swift in Sources */,
+				A10051 /* DetailPostView.swift in Sources */,
+				A10052 /* VideoSeriesPlayerView.swift in Sources */,
+				A10053 /* BookingCalendarView.swift in Sources */,
+				A10054 /* DiamondWithdrawView.swift in Sources */,
+				A10055 /* SoundEffectManager.swift in Sources */,
+				A10056 /* UploadManager.swift in Sources */,
+				A10057 /* WaitApprovalView.swift in Sources */,
+				A10058 /* AchievementsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		P10001 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		P10002 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		P10003 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		P10004 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		P10005 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		P10006 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCBuildConfiguration section */
+		J10001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = "PROVIWEB/Config/PROVIWEB.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PROVIWEB/Config/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.israviolink.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		J10002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = "PROVIWEB/Config/PROVIWEB.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PROVIWEB/Config/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.israviolink.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		J10003 /* Debug Project */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		J10004 /* Release Project */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+				);
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F10001 /* Build configuration list for PBXNativeTarget "PROVIWEB" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				J10001 /* Debug */,
+				J10002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F10002 /* Build configuration list for PBXProject "PROVIWEB" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				J10003 /* Debug Project */,
+				J10004 /* Release Project */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = I10001 /* Project object */;
+}
