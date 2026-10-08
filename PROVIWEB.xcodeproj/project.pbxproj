@@ -447,6 +447,7 @@
 				P10004 /* FirebaseDatabase */,
 				P10005 /* FirebaseStorage */,
 				P10006 /* FirebaseMessaging */,
+				P10007 /* FirebaseCore */,
 			);
 			productName = PROVIWEB;
 			productReference = B10000 /* PROVIWEB.app */;
@@ -656,6 +657,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		P10007 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 

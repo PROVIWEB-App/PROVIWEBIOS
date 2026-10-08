@@ -14,7 +14,9 @@ import FirebaseMessaging
 #endif
 
 // MARK: - iOS App Delegate with Firebase Initialization, Analytics & Crashlytics
-public class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+public class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    
+    public var window: UIWindow?
     
     public func application(
         _ application: UIApplication,
