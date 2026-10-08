@@ -1,5 +1,14 @@
 import Foundation
 import Combine
+#if canImport(FirebaseAuth)
+import FirebaseAuth
+#endif
+#if canImport(FirebaseDatabase)
+import FirebaseDatabase
+#endif
+#if canImport(FirebaseStorage)
+import FirebaseStorage
+#endif
 
 // MARK: - Firebase Service Wrapper & Mock/Live Realtime Database Handler
 @MainActor
@@ -247,5 +256,91 @@ public class FirebaseService: ObservableObject {
                 listenersCount: 128
             )
         ]
+    }
+    
+    // MARK: - Live Firebase Realtime Database & Auth Integration
+    public func startLiveDatabaseSync() {
+        #if canImport(FirebaseDatabase)
+        let rootRef = Database.database().reference()
+        
+        // 1. Sync Posts in Realtime
+        rootRef.child("Posts").queryLimited(toLast: 50).observe(.value) { [weak self] snapshot in
+            guard let self = self, let value = snapshot.value as? [String: [String: Any]] else { return }
+            var remotePosts: [PostModel] = []
+            for (key, dict) in value {
+                let post = PostModel(
+                    id: key,
+                    uid: dict["uid"] as? String,
+                    uName: dict["uName"] as? String,
+                    uEmail: dict["uEmail"] as? String,
+                    uDp: dict["uDp"] as? String,
+                    pTitle: dict["pTitle"] as? String,
+                    pDescr: dict["pDescr"] as? String,
+                    pImage: dict["pImage"] as? String,
+                    pVideo: dict["pVideo"] as? String,
+                    pAudio: dict["pAudio"] as? String,
+                    pTime: dict["pTime"] as? String,
+                    pLikes: dict["pLikes"] as? String ?? "0",
+                    pComments: dict["pComments"] as? String ?? "0",
+                    pShare: dict["pShare"] as? String ?? "0",
+                    feeling: dict["feeling"] as? String,
+                    location: dict["location"] as? String,
+                    isPromoted: dict["isPromoted"] as? Bool ?? false
+                )
+                remotePosts.append(post)
+            }
+            if !remotePosts.isEmpty {
+                self.posts = remotePosts.sorted { ($0.pTime ?? "") > ($1.pTime ?? "") }
+            }
+        }
+        
+        // 2. Sync Current User Data
+        if let user = currentUser {
+            rootRef.child("Users").child(user.id).observe(.value) { [weak self] snapshot in
+                guard let self = self, let dict = snapshot.value as? [String: Any] else { return }
+                self.currentUser = UserModel(
+                    id: user.id,
+                    uid: user.id,
+                    name: dict["name"] as? String ?? user.name,
+                    email: dict["email"] as? String ?? user.email,
+                    username: dict["username"] as? String ?? user.username,
+                    image: dict["image"] as? String ?? user.image,
+                    cover: dict["cover"] as? String,
+                    bio: dict["bio"] as? String ?? user.bio,
+                    phone: dict["phone"] as? String ?? user.phone,
+                    location: dict["location"] as? String ?? user.location,
+                    verified: dict["verified"] as? String ?? user.verified,
+                    onlineStatus: dict["onlineStatus"] as? String ?? "Online",
+                    instrument: dict["instrument"] as? String ?? user.instrument,
+                    experienceYears: dict["experienceYears"] as? Int ?? user.experienceYears,
+                    referralCode: dict["referralCode"] as? String ?? user.referralCode
+                )
+            }
+        }
+        #endif
+    }
+    
+    public func publishPostToCloud(post: PostModel) {
+        #if canImport(FirebaseDatabase)
+        let rootRef = Database.database().reference()
+        let postDict: [String: Any] = [
+            "uid": post.uid ?? "",
+            "uName": post.uName ?? "",
+            "uEmail": post.uEmail ?? "",
+            "uDp": post.uDp ?? "",
+            "pTitle": post.pTitle ?? "",
+            "pDescr": post.pDescr ?? "",
+            "pImage": post.pImage ?? "",
+            "pVideo": post.pVideo ?? "",
+            "pAudio": post.pAudio ?? "",
+            "pTime": post.pTime ?? "\(Date().timeIntervalSince1970 * 1000)",
+            "pLikes": post.pLikes ?? "0",
+            "pComments": post.pComments ?? "0",
+            "pShare": post.pShare ?? "0",
+            "feeling": post.feeling ?? "",
+            "location": post.location ?? ""
+        ]
+        rootRef.child("Posts").child(post.id).setValue(postDict)
+        #endif
     }
 }
