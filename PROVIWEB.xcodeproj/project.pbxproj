@@ -127,9 +127,9 @@
 		B10030 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Main/MainTabView.swift"; sourceTree = "<group>"; };
 		B10031 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/LoginView.swift"; sourceTree = "<group>"; };
 		B10032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B10033 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Config/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B10033 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = GoogleService-Info.plist; sourceTree = "<group>"; };
 		B10034 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "Localizable.strings"; path = "es.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		B10035 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Config/Info.plist"; sourceTree = "<group>"; };
+		B10035 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B10036 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		B10037 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		B10038 /* InAppReviewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppReviewService.swift; sourceTree = "<group>"; };
@@ -156,7 +156,7 @@
 		B10059 /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Profile/AchievementsView.swift"; sourceTree = "<group>"; };
 		B10060 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "LaunchScreen.storyboard"; sourceTree = "<group>"; };
 		B10061 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
-		B10062 /* PROVIWEB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Config/PROVIWEB.entitlements"; sourceTree = "<group>"; };
+		B10062 /* PROVIWEB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PROVIWEB.entitlements; sourceTree = "<group>"; };
 		B10063 /* EventModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventModel.swift; sourceTree = "<group>"; };
 		B10064 /* ClassModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassModel.swift; sourceTree = "<group>"; };
 		B10065 /* SheetMusicModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetMusicModel.swift; sourceTree = "<group>"; };
