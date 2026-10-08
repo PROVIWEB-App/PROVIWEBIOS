@@ -682,6 +682,8 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PROVIWEB/Config/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -710,6 +712,8 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PROVIWEB/Config/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
