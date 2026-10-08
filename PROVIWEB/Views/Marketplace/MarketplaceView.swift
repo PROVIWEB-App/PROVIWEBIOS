@@ -7,6 +7,8 @@ public struct MarketplaceView: View {
     @ObservedObject private var locationService = LocationService.shared
     @ObservedObject private var theme = ThemeManager.shared
     @State private var isHireSheetPresented: Bool = false
+    @State private var isMusicalHubPresented: Bool = false
+    @State private var isQuotesManagerPresented: Bool = false
     
     public var body: some View {
         NavigationView {
@@ -80,9 +82,9 @@ public struct MarketplaceView: View {
                             Spacer()
                             
                             Button(action: {
-                                isHireSheetPresented = true
+                                isMusicalHubPresented = true
                             }) {
-                                Text("Cotizar")
+                                Text("Ver Grupos")
                                     .font(.subheadline)
                                     .fontWeight(.bold)
                                     .foregroundColor(AppColors.primaryDark)
@@ -117,8 +119,27 @@ public struct MarketplaceView: View {
             }
             .navigationTitle("Marketplace")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { isQuotesManagerPresented = true }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "doc.text.fill")
+                            Text("Cotizaciones")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(AppColors.primary)
+                    }
+                }
+            }
             .sheet(isPresented: $isHireSheetPresented) {
                 HireMusicianQuoteView()
+            }
+            .sheet(isPresented: $isMusicalHubPresented) {
+                MusicalHubView()
+            }
+            .sheet(isPresented: $isQuotesManagerPresented) {
+                MusicalQuotesManagerView()
             }
         }
     }

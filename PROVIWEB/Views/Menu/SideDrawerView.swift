@@ -7,13 +7,19 @@ public struct SideDrawerView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @State private var isExplorePresented: Bool = false
-    @State private var isAdminPresented: Bool = false
-    @State private var isPagesPresented: Bool = false
+    @State private var isSheetMusicPresented: Bool = false
+    @State private var isEventsPresented: Bool = false
+    @State private var isClassesPresented: Bool = false
+    @State private var isMusicalHubPresented: Bool = false
     @State private var isGamesPresented: Bool = false
+    @State private var isPagesPresented: Bool = false
     @State private var isMeetingPresented: Bool = false
-    @State private var isInvitePresented: Bool = false
     @State private var isWalletPresented: Bool = false
+    @State private var isInvitePresented: Bool = false
     @State private var isNotificationsPresented: Bool = false
+    @State private var isSocialInsightsPresented: Bool = false
+    @State private var isSettingsPresented: Bool = false
+    @State private var isAdminPresented: Bool = false
     @State private var isThemeDialogPresented: Bool = false
     
     public init() {}
@@ -26,34 +32,57 @@ public struct SideDrawerView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
                         // User Profile Summary Header
-                        HStack(spacing: 14) {
-                            AvatarView(urlString: firebaseService.currentUser?.image, size: 56, isVerified: true)
-                            
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(firebaseService.currentUser?.name ?? "Israel Violín")
-                                    .font(.headline)
-                                    .foregroundColor(theme.textPrimary)
+                        Button(action: { isSocialInsightsPresented = true }) {
+                            HStack(spacing: 14) {
+                                AvatarView(urlString: firebaseService.currentUser?.image, size: 56, isVerified: true)
                                 
-                                Text("@\(firebaseService.currentUser?.username ?? "israviolink")")
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(firebaseService.currentUser?.name ?? "Israel Violín")
+                                        .font(.headline)
+                                        .foregroundColor(theme.textPrimary)
+                                    
+                                    Text("@\(firebaseService.currentUser?.username ?? "israviolink")")
+                                        .font(.caption)
+                                        .foregroundColor(theme.textSecondary)
+                                    
+                                    Text("Saldo: \(String(format: "$%.2f USD", firebaseService.walletBalance.balanceUSD)) (\(firebaseService.walletBalance.diamonds) 💎)")
+                                        .font(.caption2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(AppColors.primary)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
                                     .font(.caption)
                                     .foregroundColor(theme.textSecondary)
-                                
-                                Text("Saldo: \(String(format: "$%.2f USD", firebaseService.walletBalance.balanceUSD))")
-                                    .font(.caption2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(AppColors.primary)
+                            }
+                            .padding(16)
+                            .background(theme.cardColor)
+                            .cornerRadius(20)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        // Core Music & Community Modules
+                        VStack(spacing: 4) {
+                            DrawerRow(title: "Eventos Artísticos & Boletos", icon: "ticket.fill", color: Color.purple) {
+                                isEventsPresented = true
                             }
                             
-                            Spacer()
-                        }
-                        .padding(16)
-                        .background(theme.cardColor)
-                        .cornerRadius(20)
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                        
-                        // Menu Categories
-                        VStack(spacing: 4) {
+                            DrawerRow(title: "Biblioteca de Partituras", icon: "doc.text.fill", color: AppColors.primary) {
+                                isSheetMusicPresented = true
+                            }
+                            
+                            DrawerRow(title: "Clases Particulares & Maestros", icon: "graduationcap.fill", color: Color.blue) {
+                                isClassesPresented = true
+                            }
+                            
+                            DrawerRow(title: "Hub Musical: Mariachis & Grupos", icon: "music.mic.circle.fill", color: Color.orange) {
+                                isMusicalHubPresented = true
+                            }
+                            
                             DrawerRow(title: "Explorar Música & Playlists", icon: "music.note.list", color: AppColors.musicPrimary) {
                                 isExplorePresented = true
                             }
@@ -62,14 +91,21 @@ public struct SideDrawerView: View {
                                 isGamesPresented = true
                             }
                             
-                            DrawerRow(title: "Páginas de Artista & Grupos", icon: "music.mic.circle.fill", color: Color.orange) {
+                            DrawerRow(title: "Páginas de Artista & Bandas", icon: "person.3.sequence.fill", color: Color.teal) {
                                 isPagesPresented = true
                             }
                             
-                            DrawerRow(title: "Salas de Masterclass & Ensayos", icon: "video.fill", color: Color.purple) {
+                            DrawerRow(title: "Salas de Masterclass & Ensayos", icon: "video.fill", color: Color.indigo) {
                                 isMeetingPresented = true
                             }
-                            
+                        }
+                        .padding(8)
+                        .background(theme.cardColor)
+                        .cornerRadius(20)
+                        .padding(.horizontal, 16)
+                        
+                        // Economy, Wallet & Extras
+                        VStack(spacing: 4) {
                             DrawerRow(title: "Monedero QAV & Recompensas", icon: "wallet.pass.fill", color: AppColors.chatPrimary) {
                                 isWalletPresented = true
                             }
@@ -82,7 +118,7 @@ public struct SideDrawerView: View {
                                 isNotificationsPresented = true
                             }
                             
-                            DrawerRow(title: "Panel de Administración", icon: "shield.checkerboard", color: Color.indigo) {
+                            DrawerRow(title: "Panel de Administración", icon: "shield.checkerboard", color: Color.gray) {
                                 isAdminPresented = true
                             }
                         }
@@ -93,11 +129,13 @@ public struct SideDrawerView: View {
                         
                         // System Settings Group
                         VStack(spacing: 4) {
+                            DrawerRow(title: "Configuración y Seguridad", icon: "gearshape.fill", color: theme.textSecondary) {
+                                isSettingsPresented = true
+                            }
+                            
                             DrawerRow(title: "Tema: \(theme.currentTheme.title)", icon: "circle.lefthalf.filled", color: theme.textSecondary) {
                                 isThemeDialogPresented = true
                             }
-                            
-                            DrawerRow(title: "Idioma: Español", icon: "globe", color: theme.textSecondary) {}
                             
                             DrawerRow(title: "Cerrar Sesión", icon: "arrow.right.square.fill", color: AppColors.errorRed) {
                                 firebaseService.isAuthenticated = false
@@ -119,14 +157,20 @@ public struct SideDrawerView: View {
                     Button("Cerrar") { presentationMode.wrappedValue.dismiss() }
                 }
             }
+            .sheet(isPresented: $isEventsPresented) { EventsHomeView() }
+            .sheet(isPresented: $isSheetMusicPresented) { SheetMusicArchiveView() }
+            .sheet(isPresented: $isClassesPresented) { SearchClassesView() }
+            .sheet(isPresented: $isMusicalHubPresented) { MusicalHubView() }
             .sheet(isPresented: $isExplorePresented) { MusicExploreView() }
-            .sheet(isPresented: $isAdminPresented) { AdminDashboardView() }
-            .sheet(isPresented: $isPagesPresented) { ArtistPagesView() }
             .sheet(isPresented: $isGamesPresented) { MusicalGamesView() }
+            .sheet(isPresented: $isPagesPresented) { ArtistPagesView() }
             .sheet(isPresented: $isMeetingPresented) { LiveMeetingRoomView() }
-            .sheet(isPresented: $isInvitePresented) { InviteEarnView() }
             .sheet(isPresented: $isWalletPresented) { QAVWalletView() }
+            .sheet(isPresented: $isInvitePresented) { InviteEarnView() }
             .sheet(isPresented: $isNotificationsPresented) { NotificationsView() }
+            .sheet(isPresented: $isSocialInsightsPresented) { SocialInsightsView() }
+            .sheet(isPresented: $isSettingsPresented) { SettingsView() }
+            .sheet(isPresented: $isAdminPresented) { AdminDashboardView() }
             .confirmationDialog("Selecciona el tema de PROVIWEB", isPresented: $isThemeDialogPresented) {
                 Button("Oscuro (Night)") { theme.currentTheme = .night }
                 Button("Atenuado (Dim)") { theme.currentTheme = .dim }

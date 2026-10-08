@@ -11,6 +11,8 @@ public struct HomeView: View {
     @State private var isWalletPresented: Bool = false
     @State private var isSideDrawerPresented: Bool = false
     @State private var isNotificationsPresented: Bool = false
+    @State private var isJobBoardPresented: Bool = false
+    @State private var isSheetMusicArchivePresented: Bool = false
     
     public var body: some View {
         NavigationView {
@@ -213,14 +215,38 @@ public struct HomeView: View {
                             .padding(.horizontal, 16)
                         } else if viewModel.selectedTab == .books {
                             VStack(spacing: 12) {
+                                Button(action: { isSheetMusicArchivePresented = true }) {
+                                    HStack {
+                                        Image(systemName: "doc.text.magnifyingglass")
+                                            .foregroundColor(AppColors.primary)
+                                        Text("Explorar Archivo Completo de Partituras")
+                                            .font(.subheadline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(AppColors.primary)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundColor(AppColors.primary)
+                                    }
+                                    .padding(14)
+                                    .background(AppColors.primary.opacity(0.12))
+                                    .cornerRadius(16)
+                                }
+                                
                                 ForEach(viewModel.recentBooks) { book in
                                     BookFeedRow(book: book)
+                                        .onTapGesture {
+                                            isSheetMusicArchivePresented = true
+                                        }
                                 }
                             }
                             .padding(.horizontal, 16)
                         } else {
-                            JobBoardPlaceholder()
-                                .padding(.horizontal, 16)
+                            Button(action: { isJobBoardPresented = true }) {
+                                JobBoardPlaceholder()
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .padding(.horizontal, 16)
                         }
                     }
                     .padding(.bottom, 80)
@@ -247,6 +273,12 @@ public struct HomeView: View {
             }
             .sheet(isPresented: $isNotificationsPresented) {
                 NotificationsView()
+            }
+            .sheet(isPresented: $isJobBoardPresented) {
+                JobBoardView()
+            }
+            .sheet(isPresented: $isSheetMusicArchivePresented) {
+                SheetMusicArchiveView()
             }
         }
     }

@@ -95,3 +95,12 @@
 "delete" = "Delete";
 "loading" = "Loading...";
 "error" = "An error occurred";
+
+/* Events, Sheet Music, Classes & Hub */
+"artistic_events" = "Artistic Events";
+"digital_tickets" = "My Tickets";
+"sheet_music_archive" = "Sheet Music Library";
+"private_classes" = "Private Lessons";
+"musical_hub" = "Musical Hub";
+"compare_quotes" = "Compare Quotes";
+"eeg_muse" = "Muse Headband";

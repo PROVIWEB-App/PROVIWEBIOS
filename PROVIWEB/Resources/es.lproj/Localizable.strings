@@ -95,3 +95,12 @@
 "delete" = "Eliminar";
 "loading" = "Cargando...";
 "error" = "Ha ocurrido un error";
+
+/* Events, Sheet Music, Classes & Hub */
+"artistic_events" = "Eventos Artísticos";
+"digital_tickets" = "Mis Boletos";
+"sheet_music_archive" = "Biblioteca de Partituras";
+"private_classes" = "Clases Particulares";
+"musical_hub" = "Hub Musical";
+"compare_quotes" = "Comparar Cotizaciones";
+"eeg_muse" = "Diadema Muse";

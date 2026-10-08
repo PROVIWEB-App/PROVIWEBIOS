@@ -34,12 +34,17 @@
 	<string>PROVIWEB utiliza el reconocimiento de voz para interactuar mediante comandos vocales con el Profesor IA.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>PROVIWEB utiliza Face ID para proteger tu monedero y credenciales de forma segura.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>PROVIWEB utiliza Bluetooth para conectar la diadema Muse y medir la concentración durante la práctica.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>PROVIWEB utiliza Bluetooth para enlazar dispositivos de telemetría musical.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
 		<string>fetch</string>
 		<string>remote-notification</string>
 		<string>voip</string>
+		<string>bluetooth-central</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -68,6 +73,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>proviweb</string>
+				<string>wc</string>
 				<string>com.israviolink.ios</string>
 			</array>
 		</dict>

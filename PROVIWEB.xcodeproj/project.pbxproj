@@ -67,6 +67,30 @@
 		A10058 /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10059 /* AchievementsView.swift */; };
 		A10059 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B10060 /* LaunchScreen.storyboard */; };
 		A10060 /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = B10061 /* Sounds */; };
+		A10061 /* EventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10063 /* EventModel.swift */; };
+		A10062 /* ClassModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10064 /* ClassModel.swift */; };
+		A10063 /* SheetMusicModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10065 /* SheetMusicModel.swift */; };
+		A10064 /* MusicalGroupModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10066 /* MusicalGroupModel.swift */; };
+		A10065 /* MuseBLEService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10067 /* MuseBLEService.swift */; };
+		A10066 /* EventsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10068 /* EventsHomeView.swift */; };
+		A10067 /* EventDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10069 /* EventDetailsView.swift */; };
+		A10068 /* DigitalTicketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10070 /* DigitalTicketView.swift */; };
+		A10069 /* CreateEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10071 /* CreateEventView.swift */; };
+		A10070 /* SheetMusicArchiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10072 /* SheetMusicArchiveView.swift */; };
+		A10071 /* SheetMusicPDFViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10073 /* SheetMusicPDFViewer.swift */; };
+		A10072 /* SearchClassesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10074 /* SearchClassesView.swift */; };
+		A10073 /* BookClassView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10075 /* BookClassView.swift */; };
+		A10074 /* TeacherAvailabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10076 /* TeacherAvailabilityView.swift */; };
+		A10075 /* MyBookedClassesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10077 /* MyBookedClassesView.swift */; };
+		A10076 /* MusicalHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10078 /* MusicalHubView.swift */; };
+		A10077 /* MusicalQuotesManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10079 /* MusicalQuotesManagerView.swift */; };
+		A10078 /* SocialInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10080 /* SocialInsightsView.swift */; };
+		A10079 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10081 /* SettingsView.swift */; };
+		A10080 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10082 /* EditProfileView.swift */; };
+		A10081 /* WalletSecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10083 /* WalletSecurityView.swift */; };
+		A10082 /* LegalAndSupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10084 /* LegalAndSupportView.swift */; };
+		A10083 /* VerificationRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10085 /* VerificationRequestView.swift */; };
+		A10084 /* MuseDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10086 /* MuseDeviceView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -133,6 +157,30 @@
 		B10060 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Resources/LaunchScreen.storyboard"; sourceTree = "<group>"; };
 		B10061 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Resources/Sounds"; sourceTree = "<group>"; };
 		B10062 /* PROVIWEB.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Config/PROVIWEB.entitlements"; sourceTree = "<group>"; };
+		B10063 /* EventModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventModel.swift; sourceTree = "<group>"; };
+		B10064 /* ClassModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassModel.swift; sourceTree = "<group>"; };
+		B10065 /* SheetMusicModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetMusicModel.swift; sourceTree = "<group>"; };
+		B10066 /* MusicalGroupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicalGroupModel.swift; sourceTree = "<group>"; };
+		B10067 /* MuseBLEService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseBLEService.swift; sourceTree = "<group>"; };
+		B10068 /* EventsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Events/EventsHomeView.swift"; sourceTree = "<group>"; };
+		B10069 /* EventDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Events/EventDetailsView.swift"; sourceTree = "<group>"; };
+		B10070 /* DigitalTicketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Events/DigitalTicketView.swift"; sourceTree = "<group>"; };
+		B10071 /* CreateEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Events/CreateEventView.swift"; sourceTree = "<group>"; };
+		B10072 /* SheetMusicArchiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Archive/SheetMusicArchiveView.swift"; sourceTree = "<group>"; };
+		B10073 /* SheetMusicPDFViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Archive/SheetMusicPDFViewer.swift"; sourceTree = "<group>"; };
+		B10074 /* SearchClassesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Classes/SearchClassesView.swift"; sourceTree = "<group>"; };
+		B10075 /* BookClassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Classes/BookClassView.swift"; sourceTree = "<group>"; };
+		B10076 /* TeacherAvailabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Classes/TeacherAvailabilityView.swift"; sourceTree = "<group>"; };
+		B10077 /* MyBookedClassesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Classes/MyBookedClassesView.swift"; sourceTree = "<group>"; };
+		B10078 /* MusicalHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Marketplace/MusicalHubView.swift"; sourceTree = "<group>"; };
+		B10079 /* MusicalQuotesManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Marketplace/MusicalQuotesManagerView.swift"; sourceTree = "<group>"; };
+		B10080 /* SocialInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Profile/SocialInsightsView.swift"; sourceTree = "<group>"; };
+		B10081 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings/SettingsView.swift"; sourceTree = "<group>"; };
+		B10082 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings/EditProfileView.swift"; sourceTree = "<group>"; };
+		B10083 /* WalletSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings/WalletSecurityView.swift"; sourceTree = "<group>"; };
+		B10084 /* LegalAndSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings/LegalAndSupportView.swift"; sourceTree = "<group>"; };
+		B10085 /* VerificationRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Verification/VerificationRequestView.swift"; sourceTree = "<group>"; };
+		B10086 /* MuseDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/MuseDeviceView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,6 +283,7 @@
 			isa = PBXGroup;
 			children = (
 				B10007 /* PoseEstimationService.swift */,
+				B10067 /* MuseBLEService.swift */,
 			);
 			path = Vision;
 			sourceTree = "<group>";
@@ -279,6 +328,10 @@
 				B10013 /* SongModel.swift */,
 				B10014 /* ChatModel.swift */,
 				B10015 /* AIProfessorModel.swift */,
+				B10063 /* EventModel.swift */,
+				B10064 /* ClassModel.swift */,
+				B10065 /* SheetMusicModel.swift */,
+				B10066 /* MusicalGroupModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -327,6 +380,25 @@
 				B10055 /* DiamondWithdrawView.swift */,
 				B10058 /* WaitApprovalView.swift */,
 				B10059 /* AchievementsView.swift */,
+				B10068 /* EventsHomeView.swift */,
+				B10069 /* EventDetailsView.swift */,
+				B10070 /* DigitalTicketView.swift */,
+				B10071 /* CreateEventView.swift */,
+				B10072 /* SheetMusicArchiveView.swift */,
+				B10073 /* SheetMusicPDFViewer.swift */,
+				B10074 /* SearchClassesView.swift */,
+				B10075 /* BookClassView.swift */,
+				B10076 /* TeacherAvailabilityView.swift */,
+				B10077 /* MyBookedClassesView.swift */,
+				B10078 /* MusicalHubView.swift */,
+				B10079 /* MusicalQuotesManagerView.swift */,
+				B10080 /* SocialInsightsView.swift */,
+				B10081 /* SettingsView.swift */,
+				B10082 /* EditProfileView.swift */,
+				B10083 /* WalletSecurityView.swift */,
+				B10084 /* LegalAndSupportView.swift */,
+				B10085 /* VerificationRequestView.swift */,
+				B10086 /* MuseDeviceView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -514,6 +586,30 @@
 				A10056 /* UploadManager.swift in Sources */,
 				A10057 /* WaitApprovalView.swift in Sources */,
 				A10058 /* AchievementsView.swift in Sources */,
+				A10061 /* EventModel.swift in Sources */,
+				A10062 /* ClassModel.swift in Sources */,
+				A10063 /* SheetMusicModel.swift in Sources */,
+				A10064 /* MusicalGroupModel.swift in Sources */,
+				A10065 /* MuseBLEService.swift in Sources */,
+				A10066 /* EventsHomeView.swift in Sources */,
+				A10067 /* EventDetailsView.swift in Sources */,
+				A10068 /* DigitalTicketView.swift in Sources */,
+				A10069 /* CreateEventView.swift in Sources */,
+				A10070 /* SheetMusicArchiveView.swift in Sources */,
+				A10071 /* SheetMusicPDFViewer.swift in Sources */,
+				A10072 /* SearchClassesView.swift in Sources */,
+				A10073 /* BookClassView.swift in Sources */,
+				A10074 /* TeacherAvailabilityView.swift in Sources */,
+				A10075 /* MyBookedClassesView.swift in Sources */,
+				A10076 /* MusicalHubView.swift in Sources */,
+				A10077 /* MusicalQuotesManagerView.swift in Sources */,
+				A10078 /* SocialInsightsView.swift in Sources */,
+				A10079 /* SettingsView.swift in Sources */,
+				A10080 /* EditProfileView.swift in Sources */,
+				A10081 /* WalletSecurityView.swift in Sources */,
+				A10082 /* LegalAndSupportView.swift in Sources */,
+				A10083 /* VerificationRequestView.swift in Sources */,
+				A10084 /* MuseDeviceView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

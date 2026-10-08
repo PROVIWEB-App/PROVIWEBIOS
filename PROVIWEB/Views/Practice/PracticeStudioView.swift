@@ -7,6 +7,7 @@ public struct PracticeStudioView: View {
     @ObservedObject private var tuner = ChromaticTunerService.shared
     @ObservedObject private var theme = ThemeManager.shared
     @Environment(\.presentationMode) var presentationMode
+    @State private var isMusePresented: Bool = false
     
     public var body: some View {
         ZStack {
@@ -31,8 +32,19 @@ public struct PracticeStudioView: View {
                         .font(.headline)
                         .foregroundColor(theme.textPrimary)
                     Spacer()
-                    Image(systemName: "music.quarternote.3")
+                    Button(action: { isMusePresented = true }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "headphones")
+                            Text("Muse")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                        }
                         .foregroundColor(AppColors.primary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppColors.primary.opacity(0.12))
+                        .cornerRadius(10)
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -184,6 +196,9 @@ public struct PracticeStudioView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $isMusePresented) {
+            MuseDeviceView()
         }
     }
 }

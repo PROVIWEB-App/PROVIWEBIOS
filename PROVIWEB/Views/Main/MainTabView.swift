@@ -9,6 +9,10 @@ public struct MainTabView: View {
     @State private var isCreatePostPresented: Bool = false
     @State private var isWalletPresented: Bool = false
     @State private var isMarketplacePresented: Bool = false
+    @State private var isEventsPresented: Bool = false
+    @State private var isSheetMusicPresented: Bool = false
+    @State private var isClassesPresented: Bool = false
+    @State private var isQuotesPresented: Bool = false
     
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var chatVM = ChatViewModel()
@@ -114,9 +118,17 @@ public struct MainTabView: View {
                     isAIProfessorPresented = true
                 case .practice:
                     isPracticeStudioPresented = true
+                case .event:
+                    isEventsPresented = true
+                case .sheetMusic:
+                    isSheetMusicPresented = true
+                case .classes:
+                    isClassesPresented = true
+                case .quotes:
+                    isQuotesPresented = true
                 case .music:
                     selectedTab = .home
-                case .sell, .quotes:
+                case .sell:
                     selectedTab = .marketplace
                 case .wallet:
                     isWalletPresented = true
@@ -133,6 +145,18 @@ public struct MainTabView: View {
         }
         .sheet(isPresented: $isCreatePostPresented) {
             CreatePostView()
+        }
+        .sheet(isPresented: $isEventsPresented) {
+            EventsHomeView()
+        }
+        .sheet(isPresented: $isSheetMusicPresented) {
+            SheetMusicArchiveView()
+        }
+        .sheet(isPresented: $isClassesPresented) {
+            SearchClassesView()
+        }
+        .sheet(isPresented: $isQuotesPresented) {
+            MusicalQuotesManagerView()
         }
         .sheet(isPresented: $isWalletPresented) {
             QAVWalletView()

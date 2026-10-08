@@ -13,14 +13,17 @@ public struct CreateModalSheet: View {
         case aiProfessor
         case practice
         case music
-        case sell
+        case sheetMusic
+        case event
+        case classes
         case quotes
+        case sell
         case wallet
         case invite
     }
     
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             // Drag indicator
             Capsule()
                 .fill(Color.gray.opacity(0.4))
@@ -31,7 +34,7 @@ public struct CreateModalSheet: View {
                 .font(.headline)
                 .foregroundColor(theme.textPrimary)
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 18) {
                 CreateOptionItem(title: "Publicación", icon: "square.and.pencil", color: AppColors.primary) {
                     presentationMode.wrappedValue.dismiss()
                     onSelectOption(.post)
@@ -52,19 +55,34 @@ public struct CreateModalSheet: View {
                     onSelectOption(.practice)
                 }
                 
-                CreateOptionItem(title: "Música", icon: "music.note.list", color: AppColors.musicPrimary) {
+                CreateOptionItem(title: "Evento / Concierto", icon: "ticket.fill", color: Color.indigo) {
+                    presentationMode.wrappedValue.dismiss()
+                    onSelectOption(.event)
+                }
+                
+                CreateOptionItem(title: "Partituras", icon: "doc.text.fill", color: Color.teal) {
+                    presentationMode.wrappedValue.dismiss()
+                    onSelectOption(.sheetMusic)
+                }
+                
+                CreateOptionItem(title: "Clases Particulares", icon: "graduationcap.fill", color: Color.blue) {
+                    presentationMode.wrappedValue.dismiss()
+                    onSelectOption(.classes)
+                }
+                
+                CreateOptionItem(title: "Cotizar Mariachi", icon: "music.mic.circle.fill", color: AppColors.warningOrange) {
+                    presentationMode.wrappedValue.dismiss()
+                    onSelectOption(.quotes)
+                }
+                
+                CreateOptionItem(title: "Música & Canción", icon: "music.note.list", color: AppColors.musicPrimary) {
                     presentationMode.wrappedValue.dismiss()
                     onSelectOption(.music)
                 }
                 
-                CreateOptionItem(title: "Vender", icon: "tag.fill", color: AppColors.success) {
+                CreateOptionItem(title: "Marketplace", icon: "tag.fill", color: AppColors.success) {
                     presentationMode.wrappedValue.dismiss()
                     onSelectOption(.sell)
-                }
-                
-                CreateOptionItem(title: "Cotizaciones", icon: "music.mic.circle.fill", color: AppColors.warningOrange) {
-                    presentationMode.wrappedValue.dismiss()
-                    onSelectOption(.quotes)
                 }
                 
                 CreateOptionItem(title: "Monedero QAV", icon: "wallet.pass.fill", color: AppColors.chatPrimary) {
@@ -72,7 +90,7 @@ public struct CreateModalSheet: View {
                     onSelectOption(.wallet)
                 }
                 
-                CreateOptionItem(title: "Invitar y Ganar", icon: "person.badge.plus", color: .indigo) {
+                CreateOptionItem(title: "Invitar y Ganar", icon: "person.badge.plus", color: Color.pink) {
                     presentationMode.wrappedValue.dismiss()
                     onSelectOption(.invite)
                 }
@@ -99,7 +117,7 @@ struct CreateOptionItem: View {
                 ZStack {
                     Circle()
                         .fill(color.opacity(0.15))
-                        .frame(width: 58, height: 58)
+                        .frame(width: 54, height: 54)
                     
                     Image(systemName: icon)
                         .font(.title2)

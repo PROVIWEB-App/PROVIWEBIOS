@@ -732,20 +732,193 @@
             </div>
             <div style="padding: 16px;">
                 <div style="background: var(--card-bg); border-radius: 16px; padding: 8px;">
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('eventsModal');">
+                        <i class="fas fa-ticket-alt" style="color: #FF5722;"></i> Eventos & Boletos Digitales
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('sheetMusicModal');">
+                        <i class="fas fa-file-pdf" style="color: #4CAF50;"></i> Biblioteca de Partituras & PDF
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('classesModal');">
+                        <i class="fas fa-chalkboard-teacher" style="color: #9C27B0;"></i> Clases & Masterclasses
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('hubModal');">
+                        <i class="fas fa-users" style="color: #FF9800;"></i> Hub Musical & Cotizador
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('museModal');">
+                        <i class="fas fa-wave-square" style="color: #00BCD4;"></i> Gadget Muse EEG Bluetooth
+                    </div>
                     <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('practiceModal');">
                         <i class="fas fa-music" style="color: var(--music-primary);"></i> Explorar Música y Playlists
                     </div>
-                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Reto de Acordes y Entrenamiento Auditivo.');">
-                        <i class="fas fa-gamecontroller" style="color: var(--gold);"></i> Juegos Musicales & Oído
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="closeModal('menuModal'); openModal('settingsModal');">
+                        <i class="fas fa-cog" style="color: #9E9E9E;"></i> Ajustes & Verificación Oficial
                     </div>
-                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Cotizador de Mariachis y Bandas.');">
-                        <i class="fas fa-bullhorn" style="color: orange;"></i> Cotizaciones de Agrupaciones
-                    </div>
-                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Programa de Embajadores ($0.50 USD por artista).');">
+                    <div style="padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Programa de Embajadores ($0.50 USD por artista).');">
                         <i class="fas fa-gift" style="color: #4BB543;"></i> Invitar Artistas y Ganar
                     </div>
-                    <div style="padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="alert('Abriendo Panel de Administración y Revisión de Derechos.');">
-                        <i class="fas fa-shield-alt" style="color: #9C27B0;"></i> Panel de Administración
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Events & Digital Tickets -->
+        <div class="modal-view" id="eventsModal">
+            <div class="modal-header">
+                <h3>Eventos & Boletos Digitales</h3>
+                <button class="close-modal-btn" onclick="closeModal('eventsModal')">Cerrar</button>
+            </div>
+            <div style="padding: 16px; overflow-y: auto;">
+                <div style="background: linear-gradient(135deg, #FF5722, #E64A19); padding: 18px; border-radius: 16px; margin-bottom: 16px; color: #fff;">
+                    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Próximo Concierto Estelar</span>
+                    <h3 style="font-size: 18px; font-weight: 800; margin: 4px 0 8px 0;">Recital de Gala: Czardas & Huapango</h3>
+                    <p style="font-size: 12px; opacity: 0.9;">Sala Nezahualcóyotl • 15 Octubre, 20:00 hrs</p>
+                    <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 14px; font-weight: 700;">$25.00 USD <small>(o 200 💎)</small></span>
+                        <button style="background: #fff; color: #E64A19; border: none; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer;" onclick="alert('Boleto adquirido. Generando código QR dinámico con verificación criptográfica.');">Adquirir Boleto</button>
+                    </div>
+                </div>
+
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 16px; border: 1px dashed rgba(255,255,255,0.2); text-align: center;">
+                    <span style="font-size: 11px; color: var(--gold); font-weight: 700;">TU BOLETO DIGITAL VÁLIDO</span>
+                    <h4 style="margin: 6px 0; font-size: 15px;">Boleto #PW-84729</h4>
+                    <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; margin: 8px 0;">
+                        <i class="fas fa-qrcode" style="font-size: 80px; color: #000;"></i>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-secondary);">Presenta este código en la entrada del evento o transmisión privada.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Sheet Music & PDF Viewer -->
+        <div class="modal-view" id="sheetMusicModal">
+            <div class="modal-header">
+                <h3>Biblioteca de Partituras PDF</h3>
+                <button class="close-modal-btn" onclick="closeModal('sheetMusicModal')">Cerrar</button>
+            </div>
+            <div style="padding: 16px; overflow-y: auto;">
+                <div style="display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto;">
+                    <span style="background: var(--primary); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Todos</span>
+                    <span style="background: var(--card-bg); color: var(--text-secondary); padding: 6px 12px; border-radius: 20px; font-size: 12px;">Mariachi</span>
+                    <span style="background: var(--card-bg); color: var(--text-secondary); padding: 6px 12px; border-radius: 20px; font-size: 12px;">Clásico</span>
+                    <span style="background: var(--card-bg); color: var(--text-secondary); padding: 6px 12px; border-radius: 20px; font-size: 12px;">Banda</span>
+                </div>
+
+                <div style="background: var(--card-bg); border-radius: 14px; padding: 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h4 style="font-size: 14px; margin-bottom: 4px;">Czardas de Vittorio Monti</h4>
+                        <span style="font-size: 11px; color: var(--text-secondary);">Violín Solo • Nivel Avanzado • 6 Páginas</span>
+                    </div>
+                    <button style="background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;" onclick="alert('Abriendo Visor PDF interactivo con metrónomo sincronizado y backing track.');"><i class="fas fa-eye"></i> Ver PDF</button>
+                </div>
+
+                <div style="background: var(--card-bg); border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h4 style="font-size: 14px; margin-bottom: 4px;">El Son de la Negra (Score)</h4>
+                        <span style="font-size: 11px; color: var(--text-secondary);">Mariachi Completo • Nivel Intermedio</span>
+                    </div>
+                    <button style="background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;" onclick="alert('Abriendo Score con particellas de Trompeta, Violines y Armonía.');"><i class="fas fa-eye"></i> Ver PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Masterclasses & Private Lessons -->
+        <div class="modal-view" id="classesModal">
+            <div class="modal-header">
+                <h3>Clases Particulares & Masterclasses</h3>
+                <button class="close-modal-btn" onclick="closeModal('classesModal')">Cerrar</button>
+            </div>
+            <div style="padding: 16px; overflow-y: auto;">
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 14px;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                            <h4 style="font-size: 15px;">Mtro. Israel Violín</h4>
+                            <span style="font-size: 12px; color: #4BB543;">★ 4.95 (42 reseñas) • Solista Filarmónica</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 10px 0;">Especialista en técnica del arco francés, afinación fina y repertorio de concierto.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                        <span style="font-size: 14px; font-weight: 700; color: var(--primary);">$30.00 USD / hora</span>
+                        <button style="background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;" onclick="alert('Horario reservado para clase individual en vivo.');">Reservar Clase</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Musical Hub & Quotes -->
+        <div class="modal-view" id="hubModal">
+            <div class="modal-header">
+                <h3>Directorio & Cotizador de Grupos</h3>
+                <button class="close-modal-btn" onclick="closeModal('hubModal')">Cerrar</button>
+            </div>
+            <div style="padding: 16px; overflow-y: auto;">
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 style="font-size: 15px;">Mariachi Real Azteca</h4>
+                        <span style="background: rgba(255, 152, 0, 0.2); color: #FF9800; padding: 4px 8px; border-radius: 10px; font-size: 10px; font-weight: 700;">10 Músicos</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0;">Traje de gala, sonido profesional, serenatas y bodas en CDMX y Edomex.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                        <span style="font-size: 13px; font-weight: 700;">Desde $3,500 MXN / hr</span>
+                        <button style="background: #FF9800; color: #fff; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;" onclick="alert('Cotización enviada a Mariachi Real Azteca.');">Solicitar Cotización</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Muse BLE Headband -->
+        <div class="modal-view" id="museModal">
+            <div class="modal-header">
+                <h3>Gadget Muse EEG Bluetooth</h3>
+                <button class="close-modal-btn" onclick="closeModal('museModal')">Cerrar</button>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 20px; margin-bottom: 16px;">
+                    <i class="fas fa-brain" style="font-size: 40px; color: #00BCD4; margin-bottom: 10px;"></i>
+                    <h4 style="font-size: 16px;">Muse 2 / Muse S EEG</h4>
+                    <span style="color: #4BB543; font-size: 12px; font-weight: 700;">● Vinculado vía CoreBluetooth</span>
+                    
+                    <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                        <div>
+                            <span style="font-size: 11px; color: var(--text-secondary);">Enfoque</span>
+                            <div style="font-size: 26px; font-weight: 900; color: #00BCD4;">88%</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 11px; color: var(--text-secondary);">Calma</span>
+                            <div style="font-size: 26px; font-weight: 900; color: #4BB543;">94%</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 11px; color: var(--text-secondary);">Batería</span>
+                            <div style="font-size: 26px; font-weight: 900; color: var(--gold);">82%</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary);">La telemetría cerebral en tiempo real ajusta las recomendaciones de práctica y postura en el estudio.</p>
+            </div>
+        </div>
+
+        <!-- MODAL: Settings & Security -->
+        <div class="modal-view" id="settingsModal">
+            <div class="modal-header">
+                <h3>Ajustes & Seguridad</h3>
+                <button class="close-modal-btn" onclick="closeModal('settingsModal')">Cerrar</button>
+            </div>
+            <div style="padding: 16px; overflow-y: auto;">
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 14px;"><i class="fas fa-fingerprint" style="color: var(--primary);"></i> Face ID / Touch ID</span>
+                        <span style="color: #4BB543; font-weight: 700; font-size: 12px;">Activo</span>
+                    </div>
+                </div>
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 14px;"><i class="fas fa-key" style="color: var(--gold);"></i> Clave Privada Web3</span>
+                        <button style="background: none; border: 1px solid var(--border-color); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 11px; cursor: pointer;" onclick="alert('Autenticación biométrica requerida para ver la clave privada.');">Exportar</button>
+                    </div>
+                </div>
+                <div style="background: var(--card-bg); border-radius: 16px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 14px;"><i class="fas fa-id-badge" style="color: #9C27B0;"></i> Verificación de Artista</span>
+                        <span style="background: rgba(156, 39, 176, 0.2); color: #BA68C8; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">En Revisión</span>
                     </div>
                 </div>
             </div>

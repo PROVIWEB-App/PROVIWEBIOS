@@ -7,6 +7,11 @@ public struct ProfileView: View {
     @State private var selectedTab: Int = 0
     @State private var isVerificationSheetPresented: Bool = false
     @State private var isThemeSelectorPresented: Bool = false
+    @State private var isSettingsPresented: Bool = false
+    @State private var isSocialInsightsPresented: Bool = false
+    @State private var socialInsightsTab: SocialInsightsView.InsightTab = .followers
+    
+    public init() {}
     
     public var body: some View {
         NavigationView {
@@ -43,11 +48,25 @@ public struct ProfileView: View {
                                     .padding(.horizontal, 16)
                             }
                             
-                            // Stats Row
+                            // Stats Row (Clickable to open Social Insights)
                             HStack(spacing: 32) {
                                 StatItem(count: "128", title: "Posts")
-                                StatItem(count: "3.4k", title: "Seguidores")
-                                StatItem(count: "290", title: "Siguiendo")
+                                
+                                Button(action: {
+                                    socialInsightsTab = .followers
+                                    isSocialInsightsPresented = true
+                                }) {
+                                    StatItem(count: "3.4k", title: "Seguidores")
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                
+                                Button(action: {
+                                    socialInsightsTab = .following
+                                    isSocialInsightsPresented = true
+                                }) {
+                                    StatItem(count: "290", title: "Siguiendo")
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                             .padding(.top, 4)
                             
@@ -99,14 +118,15 @@ public struct ProfileView: View {
                                 .foregroundColor(AppColors.primary)
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Tiempo Practicado Total")
-                                    .font(.caption)
-                                    .foregroundColor(theme.textSecondary)
-                                Text("18 horas 42 minutos")
-                                    .font(.headline)
+                                Text("Nivel de Práctica: Maestro")
+                                    .font(.subheadline)
                                     .fontWeight(.bold)
                                     .foregroundColor(theme.textPrimary)
+                                Text("Más de 120 horas acumuladas este mes")
+                                    .font(.caption)
+                                    .foregroundColor(theme.textSecondary)
                             }
+                            
                             Spacer()
                         }
                         .padding(16)
@@ -127,8 +147,22 @@ public struct ProfileView: View {
             }
             .navigationTitle("Mi Perfil")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { isSettingsPresented = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(theme.textPrimary)
+                    }
+                }
+            }
+            .sheet(isPresented: $isSettingsPresented) {
+                SettingsView()
+            }
+            .sheet(isPresented: $isSocialInsightsPresented) {
+                SocialInsightsView(initialTab: socialInsightsTab)
+            }
             .sheet(isPresented: $isVerificationSheetPresented) {
-                VerificationRequestSheet()
+                VerificationRequestView()
             }
             .confirmationDialog("Selecciona el tema de PROVIWEB", isPresented: $isThemeSelectorPresented) {
                 Button("Oscuro (Night)") { theme.currentTheme = .night }
@@ -154,67 +188,6 @@ struct StatItem: View {
             Text(title)
                 .font(.caption2)
                 .foregroundColor(theme.textSecondary)
-        }
-    }
-}
-
-// MARK: - Verification Request Sheet
-struct VerificationRequestSheet: View {
-    @ObservedObject private var theme = ThemeManager.shared
-    @Environment(\.presentationMode) var presentationMode
-    @State private var badgeType: String = "Estudiante"
-    @State private var institution: String = ""
-    @State private var credentialNumber: String = ""
-    @State private var isSent: Bool = false
-    
-    var body: some View {
-        NavigationView {
-            ZStack {
-                theme.backgroundColor.ignoresSafeArea()
-                
-                Form {
-                    Section(header: Text("Insignia Solicitada")) {
-                        Picker("Tipo de Perfil", selection: $badgeType) {
-                            Text("Estudiante de Música").tag("Estudiante")
-                            Text("Profesor / Maestro").tag("Profesor")
-                            Text("Institución / Conservatorio / Orquesta").tag("Entidad")
-                            Text("Músico / Artista Profesional").tag("Artista")
-                        }
-                    }
-                    
-                    Section(header: Text("Datos Académicos o Profesionales")) {
-                        TextField("Conservatorio / Escuela / Orquesta", text: $institution)
-                        TextField("Número de Matrícula o Cédula", text: $credentialNumber)
-                    }
-                    
-                    Button(action: {
-                        isSent = true
-                    }) {
-                        Text("Enviar Solicitud de Verificación")
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                    }
-                    .listRowBackground(AppColors.primary)
-                }
-            }
-            .navigationTitle("Insignias Verificadas")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cerrar") { presentationMode.wrappedValue.dismiss() }
-                }
-            }
-            .alert(isPresented: $isSent) {
-                Alert(
-                    title: Text("Solicitud en Revisión"),
-                    message: Text("El equipo de administración de PROVIWEB revisará tus credenciales en un plazo de 24 a 72 horas."),
-                    dismissButton: .default(Text("Entendido")) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                )
-            }
         }
     }
 }
