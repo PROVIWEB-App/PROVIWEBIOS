@@ -1,0 +1,60 @@
+name: Build & Distribute PROVIWEB iOS IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-distribute:
+    name: Build IPA on macOS Runner
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode 15.4
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+
+      - name: Resolve Swift Packages
+        run: |
+          xcodebuild -resolvePackageDependencies -project PROVIWEB.xcodeproj -scheme PROVIWEB
+
+      - name: Build Xcode Archive
+        run: |
+          xcodebuild archive \
+            -project PROVIWEB.xcodeproj \
+            -scheme PROVIWEB \
+            -configuration Release \
+            -archivePath build/PROVIWEB.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package IPA
+        run: |
+          mkdir -p build/Payload
+          cp -R build/PROVIWEB.xcarchive/Products/Applications/PROVIWEB.app build/Payload/
+          cd build
+          zip -qry PROVIWEB.ipa Payload
+          cd ..
+
+      - name: Upload IPA Artifact to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: PROVIWEB-IPA
+          path: build/PROVIWEB.ipa
+          retention-days: 14
+
+      - name: Distribute to Firebase App Distribution
+        if: env.FIREBASE_TOKEN != ''
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          npm install -g firebase-tools
+          firebase appdistribution:distribute build/PROVIWEB.ipa \
+            --app 1:475963980955:ios:2441bbe38752b18c8e1a3e \
+            --release-notes "PROVIWEB iOS v1.0.0 (Build 1) - Release Beta migrado exitosamente desde Android." \
+            --groups "testers,qa-team" \
+            --token "$FIREBASE_TOKEN"
