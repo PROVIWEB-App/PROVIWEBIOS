@@ -270,7 +270,7 @@ public class FirebaseService: ObservableObject {
             for (key, dict) in value {
                 let post = PostModel(
                     id: key,
-                    uid: dict["uid"] as? String,
+                    uid: dict["uid"] as? String ?? "",
                     uName: dict["uName"] as? String,
                     uEmail: dict["uEmail"] as? String,
                     uDp: dict["uDp"] as? String,

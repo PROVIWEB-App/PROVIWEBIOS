@@ -86,6 +86,12 @@ public class AudioPlayerService: NSObject, ObservableObject {
         }
         updateNowPlayingInfo()
     }
+
+    public func pause() {
+        player?.pause()
+        isPlaying = false
+        updateNowPlayingInfo()
+    }
     
     public func seek(to time: Double) {
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)

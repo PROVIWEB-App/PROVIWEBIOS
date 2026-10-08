@@ -23,127 +23,8 @@ public struct DetailPostView: View {
                 theme.backgroundColor.ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 16) {
-                            // Main Post Card
-                            PostCardView(post: post)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 12)
-                            
-                            // Comments Section Header
-                            HStack {
-                                Text("Comentarios (\(comments.count))")
-                                    .font(.headline)
-                                    .foregroundColor(theme.textPrimary)
-                                Spacer()
-                            }
-                            .padding(.horizontal, 16)
-                            
-                            // Comments List
-                            ForEach(comments) { comment in
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack(alignment: .top, spacing: 10) {
-                                        AvatarView(urlString: comment.authorAvatar, size: 36, isVerified: false)
-                                        
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            HStack {
-                                                Text(comment.authorName)
-                                                    .font(.caption)
-                                                    .fontWeight(.bold)
-                                                    .foregroundColor(theme.textPrimary)
-                                                
-                                                Text(comment.timeAgo)
-                                                    .font(.caption2)
-                                                    .foregroundColor(theme.textSecondary)
-                                            }
-                                            
-                                            Text(comment.text)
-                                                .font(.caption)
-                                                .foregroundColor(theme.textPrimary)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Button(action: {
-                                            if let idx = comments.firstIndex(where: { $0.id == comment.id }) {
-                                                comments[idx].isLiked.toggle()
-                                                comments[idx].likesCount += comments[idx].isLiked ? 1 : -1
-                                            }
-                                        }) {
-                                            VStack(spacing: 2) {
-                                                Image(systemName: comment.isLiked ? "heart.fill" : "heart")
-                                                    .font(.caption)
-                                                    .foregroundColor(comment.isLiked ? .red : theme.textSecondary)
-                                                
-                                                if comment.likesCount > 0 {
-                                                    Text("\(comment.likesCount)")
-                                                        .font(.system(size: 9))
-                                                        .foregroundColor(theme.textSecondary)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                    // Replies
-                                    if !comment.replies.isEmpty {
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            ForEach(comment.replies) { reply in
-                                                HStack(alignment: .top, spacing: 8) {
-                                                    Rectangle()
-                                                        .fill(AppColors.primary.opacity(0.3))
-                                                        .frame(width: 2)
-                                                        .padding(.vertical, 2)
-                                                    
-                                                    VStack(alignment: .leading, spacing: 2) {
-                                                        Text(reply.authorName)
-                                                            .font(.system(size: 11, weight: .bold))
-                                                            .foregroundColor(AppColors.primary)
-                                                        Text(reply.text)
-                                                            .font(.system(size: 11))
-                                                            .foregroundColor(theme.textPrimary)
-                                                    }
-                                                }
-                                                .padding(.leading, 36)
-                                            }
-                                        }
-                                    }
-                                }
-                                .padding(12)
-                                .background(theme.cardColor)
-                                .cornerRadius(14)
-                                .padding(.horizontal, 16)
-                            }
-                        }
-                        .padding(.bottom, 20)
-                    }
-                    
-                    // Comment Composer Bar
-                    HStack(spacing: 10) {
-                        TextField("Escribe un comentario...", text: $commentText)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
-                            .background(theme.cardColor)
-                            .cornerRadius(20)
-                            .foregroundColor(theme.textPrimary)
-                        
-                        Button(action: {
-                            if !commentText.isEmpty {
-                                let newComment = CommentThreadModel(id: UUID().uuidString, authorName: "Israel Violín", authorAvatar: nil, text: commentText, timeAgo: "Ahora", likesCount: 0, isLiked: false, replies: [])
-                                comments.append(newComment)
-                                commentText = ""
-                            }
-                        }) {
-                            Image(systemName: "paperplane.fill")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(10)
-                                .background(AppColors.primary)
-                                .clipShape(Circle())
-                        }
-                    }
-                    .padding(12)
-                    .background(theme.cardColor)
-                    .border(theme.borderSecondary, width: 0.5)
+                    postAndComments
+                    commentComposer
                 }
             }
             .navigationTitle("Detalle de Publicación")
@@ -154,6 +35,147 @@ public struct DetailPostView: View {
                 }
             }
         }
+    }
+
+    private var postAndComments: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
+                PostCardView(post: post)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+
+                HStack {
+                    Text("Comentarios (\(comments.count))")
+                        .font(.headline)
+                        .foregroundColor(theme.textPrimary)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+
+                commentsList
+            }
+            .padding(.bottom, 20)
+        }
+    }
+
+    private var commentsList: some View {
+        ForEach(comments) { comment in
+            commentRow(comment)
+        }
+    }
+
+    private func commentRow(_ comment: CommentThreadModel) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 10) {
+                AvatarView(urlString: comment.authorAvatar, size: 36, isVerified: false)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(comment.authorName)
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(theme.textPrimary)
+
+                        Text(comment.timeAgo)
+                            .font(.caption2)
+                            .foregroundColor(theme.textSecondary)
+                    }
+
+                    Text(comment.text)
+                        .font(.caption)
+                        .foregroundColor(theme.textPrimary)
+                }
+
+                Spacer()
+
+                Button(action: { toggleLike(for: comment) }) {
+                    VStack(spacing: 2) {
+                        Image(systemName: comment.isLiked ? "heart.fill" : "heart")
+                            .font(.caption)
+                            .foregroundColor(comment.isLiked ? .red : theme.textSecondary)
+
+                        if comment.likesCount > 0 {
+                            Text("\(comment.likesCount)")
+                                .font(.system(size: 9))
+                                .foregroundColor(theme.textSecondary)
+                        }
+                    }
+                }
+            }
+
+            if !comment.replies.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(comment.replies) { reply in
+                        HStack(alignment: .top, spacing: 8) {
+                            Rectangle()
+                                .fill(AppColors.primary.opacity(0.3))
+                                .frame(width: 2)
+                                .padding(.vertical, 2)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(reply.authorName)
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(AppColors.primary)
+                                Text(reply.text)
+                                    .font(.system(size: 11))
+                                    .foregroundColor(theme.textPrimary)
+                            }
+                        }
+                        .padding(.leading, 36)
+                    }
+                }
+            }
+        }
+        .padding(12)
+        .background(theme.cardColor)
+        .cornerRadius(14)
+        .padding(.horizontal, 16)
+    }
+
+    private var commentComposer: some View {
+        HStack(spacing: 10) {
+            TextField("Escribe un comentario...", text: $commentText)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(theme.cardColor)
+                .cornerRadius(20)
+                .foregroundColor(theme.textPrimary)
+
+            Button(action: addComment) {
+                Image(systemName: "paperplane.fill")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(10)
+                    .background(AppColors.primary)
+                    .clipShape(Circle())
+            }
+        }
+        .padding(12)
+        .background(theme.cardColor)
+        .border(theme.borderColor, width: 0.5)
+    }
+
+    private func toggleLike(for comment: CommentThreadModel) {
+        guard let index = comments.firstIndex(where: { $0.id == comment.id }) else { return }
+        comments[index].isLiked.toggle()
+        comments[index].likesCount += comments[index].isLiked ? 1 : -1
+    }
+
+    private func addComment() {
+        guard !commentText.isEmpty else { return }
+        comments.append(
+            CommentThreadModel(
+                id: UUID().uuidString,
+                authorName: "Israel Violín",
+                authorAvatar: nil,
+                text: commentText,
+                timeAgo: "Ahora",
+                likesCount: 0,
+                isLiked: false,
+                replies: []
+            )
+        )
+        commentText = ""
     }
 }
 
