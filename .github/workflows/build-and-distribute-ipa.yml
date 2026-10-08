@@ -13,8 +13,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Xcode 15.4
-        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+      - name: Setup Xcode 16.2
+        run: sudo xcode-select -switch /Applications/Xcode_16.2.app
 
       - name: Resolve Swift Packages
         run: |
