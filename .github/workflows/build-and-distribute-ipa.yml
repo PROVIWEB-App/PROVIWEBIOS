@@ -11,6 +11,8 @@ jobs:
   build-and-distribute:
     name: Build IPA on macOS Runner
     runs-on: macos-14
+    env:
+      ACTIONS_RUNNER_FORCE_NODE24: "true"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
