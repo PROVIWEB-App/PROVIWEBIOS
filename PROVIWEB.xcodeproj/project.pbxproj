@@ -116,7 +116,7 @@
 		B10019 /* PostCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Components/PostCardView.swift"; sourceTree = "<group>"; };
 		B10020 /* MusicPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Music/MusicPlayerView.swift"; sourceTree = "<group>"; };
 		B10021 /* AIProfessorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AIProfessor/AIProfessorView.swift"; sourceTree = "<group>"; };
-		B10022 /* ReelsView.swift in Sources */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reels/ReelsView.swift"; sourceTree = "<group>"; };
+		B10022 /* ReelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reels/ReelsView.swift"; sourceTree = "<group>"; };
 		B10023 /* ChatListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Chat/ChatListView.swift"; sourceTree = "<group>"; };
 		B10024 /* PracticeStudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Practice/PracticeStudioView.swift"; sourceTree = "<group>"; };
 		B10025 /* MarketplaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Marketplace/MarketplaceView.swift"; sourceTree = "<group>"; };
@@ -523,7 +523,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run";
+			shellScript = "if [ -f \"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\" ]; then\n  \"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -679,6 +679,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PROVIWEB/Config/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -709,6 +710,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PROVIWEB/Config/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
