@@ -65,9 +65,18 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             ENABLE_USER_SCRIPT_SANDBOXING=NO
-          cd build/DerivedData/Build/Products/Debug-iphonesimulator
-          zip -qry ../../../../PROVIWEB-Simulator-Appetize.zip PROVIWEB.app
-          cd ../../../../
+          APP_DIR=$(find build/DerivedData/Build/Products/Debug-iphonesimulator -name "*.app" -maxdepth 1 | head -n 1)
+          if [ -d "$APP_DIR" ]; then
+            cd "$(dirname "$APP_DIR")"
+            zip -qry "$GITHUB_WORKSPACE/PROVIWEB-Simulator-Appetize.zip" "$(basename "$APP_DIR")"
+            cd "$GITHUB_WORKSPACE"
+            echo "✓ PROVIWEB-Simulator-Appetize.zip creado exitosamente en $GITHUB_WORKSPACE"
+            ls -lh "$GITHUB_WORKSPACE/PROVIWEB-Simulator-Appetize.zip"
+          else
+            echo "ERROR: No se encontró .app en build/DerivedData/Build/Products/Debug-iphonesimulator"
+            find build/DerivedData -name "*.app"
+            exit 1
+          fi
 
       - name: Upload Appetize Simulator Build Artifact
         uses: actions/upload-artifact@v4
