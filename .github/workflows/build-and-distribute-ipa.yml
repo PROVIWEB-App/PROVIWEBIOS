@@ -58,6 +58,7 @@ jobs:
             -project PROVIWEB.xcodeproj \
             -scheme PROVIWEB \
             -configuration Debug \
+            -sdk iphonesimulator \
             -destination "generic/platform=iOS Simulator" \
             -derivedDataPath build/DerivedData \
             CODE_SIGN_IDENTITY="" \
