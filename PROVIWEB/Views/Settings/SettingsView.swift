@@ -81,9 +81,9 @@ public struct SettingsView: View {
                         Toggle("Reproducción Automática de Reels", isOn: $autoPlayVideos)
                         
                         Picker("Tema Visual", selection: $theme.currentTheme) {
-                            Text("Oscuro (Night)").tag(ThemeManager.AppTheme.night)
-                            Text("Atenuado (Dim)").tag(ThemeManager.AppTheme.dim)
-                            Text("Claro (Light)").tag(ThemeManager.AppTheme.light)
+                            Text("Oscuro (Night)").tag(ThemeMode.night)
+                            Text("Atenuado (Dim)").tag(ThemeMode.dim)
+                            Text("Claro (Light)").tag(ThemeMode.light)
                         }
                     }
                     

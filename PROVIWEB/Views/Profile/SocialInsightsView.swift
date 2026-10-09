@@ -28,8 +28,8 @@ public struct SocialInsightsView: View {
             username: "elenaviolin",
             image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60",
             bio: "Violinista en Filarmónica de la Ciudad de México.",
-            instrument: "Violín",
-            verified: "musician"
+            verified: "musician",
+            instrument: "Violín"
         ),
         UserModel(
             id: "u2",
@@ -37,8 +37,8 @@ public struct SocialInsightsView: View {
             username: "soldeoro",
             image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60",
             bio: "Mariachi profesional disponible para eventos y serenatas.",
-            instrument: "Mariachi",
-            verified: "entity"
+            verified: "entity",
+            instrument: "Mariachi"
         ),
         UserModel(
             id: "u3",
@@ -46,12 +46,12 @@ public struct SocialInsightsView: View {
             username: "mateocello",
             image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=60",
             bio: "Violonchelista y compositor.",
-            instrument: "Violonchelo",
-            verified: "musician"
+            verified: "musician",
+            instrument: "Violonchelo"
         )
     ]
     
-    var body: some View {
+    public var body: some View {
         NavigationView {
             ZStack {
                 theme.backgroundColor.ignoresSafeArea()

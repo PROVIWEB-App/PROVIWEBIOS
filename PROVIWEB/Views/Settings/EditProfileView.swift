@@ -80,7 +80,7 @@ public struct EditProfileView: View {
             .onAppear {
                 if let u = firebase.currentUser {
                     name = u.name
-                    username = u.username
+                    username = u.username ?? ""
                     bio = u.bio ?? ""
                     instrument = u.instrument ?? "Violín"
                     experienceYears = u.experienceYears ?? 10
