@@ -64,6 +64,54 @@ public class ChatViewModel: ObservableObject {
                 message: "¡Excelente ensayo de hoy! Nos vemos el jueves para afinar el cuarteto 🎻",
                 timestamp: "10:45 AM",
                 type: .text
+            ),
+            // Android equivalent: Split-Sheet Collaborative Royalties Agreement
+            ChatMessageModel(
+                id: "msg_split_1",
+                sender: "user_demo_violin_001",
+                receiver: "user_maria_01",
+                message: "📋 Acuerdo de Colaboración Split Sheet para 'Dueto en Sol Mayor'",
+                timestamp: "10:50 AM",
+                type: .splitSheet,
+                splitSheet: SplitSheetAgreementModel(
+                    agreementId: "AGR-92041",
+                    songTitle: "Dueto en Sol Mayor para Cuerdas",
+                    genre: "Clásica / Cámara",
+                    creatorId: "user_demo_violin_001",
+                    creatorName: "Israel Violín",
+                    creatorRole: "Compositor & 1er Violín",
+                    creatorPercentage: 60,
+                    creatorSigned: true,
+                    collaboratorId: "user_maria_01",
+                    collaboratorName: "María García",
+                    collaboratorRole: "Arreglista & Cello",
+                    collaboratorPercentage: 40,
+                    collaboratorSigned: false,
+                    status: "pending",
+                    digitalCertificateHash: "a8f9c4b2e10d3f8a9e01bc34d56789fa12bcde34",
+                    createdTimestamp: Date().timeIntervalSince1970 * 1000
+                )
+            ),
+            // Android equivalent: Job Proposal / Contract in Chat
+            ChatMessageModel(
+                id: "msg_prop_1",
+                sender: "entity_mariachi_01",
+                receiver: "user_demo_violin_001",
+                message: "💼 Propuesta de Contrato Musical: Serenata Fin de Semana",
+                timestamp: "11:00 AM",
+                type: .proposal,
+                proposal: JobProposalModel(
+                    proposalId: "PROP-8812",
+                    jobRole: "Primer Violín de Refuerzo",
+                    jobEvent: "Serenata de Gala",
+                    jobDate: "Sábado 21:00 hrs",
+                    jobLocation: "Salón Bellas Artes, CDMX",
+                    jobPrice: 120.0,
+                    jobCurrency: "USD",
+                    jobPaymentFrequency: "Por Servicio",
+                    jobStatus: "PENDING",
+                    jobDetails: "Repertorio clásico mexicano y sones jaliscienses. Traje de gala requerido."
+                )
             )
         ]
     }
@@ -80,6 +128,93 @@ public class ChatViewModel: ObservableObject {
         )
         currentMessages.append(newMsg)
         messageText = ""
+    }
+    
+    public func sendSplitSheet(
+        receiverId: String,
+        collaboratorName: String,
+        songTitle: String,
+        genre: String,
+        creatorRole: String,
+        creatorPercent: Int,
+        collaboratorRole: String,
+        collaboratorPercent: Int
+    ) {
+        let agreementId = "AGR-\(Int.random(in: 10000...99999))"
+        let hash = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+        let split = SplitSheetAgreementModel(
+            agreementId: agreementId,
+            songTitle: songTitle,
+            genre: genre,
+            creatorId: FirebaseService.shared.currentUserId,
+            creatorName: FirebaseService.shared.currentUser?.name ?? "Músico PROVIWEB",
+            creatorRole: creatorRole,
+            creatorPercentage: creatorPercent,
+            creatorSigned: true,
+            collaboratorId: receiverId,
+            collaboratorName: collaboratorName,
+            collaboratorRole: collaboratorRole,
+            collaboratorPercentage: collaboratorPercent,
+            collaboratorSigned: false,
+            status: "pending",
+            digitalCertificateHash: hash
+        )
+        
+        let newMsg = ChatMessageModel(
+            id: UUID().uuidString,
+            sender: FirebaseService.shared.currentUserId,
+            receiver: receiverId,
+            message: "📋 Acuerdo Split Sheet generado para '\(songTitle)'",
+            timestamp: "Ahora",
+            type: .splitSheet,
+            splitSheet: split
+        )
+        currentMessages.append(newMsg)
+    }
+    
+    public func signSplitSheet(messageId: String) {
+        if let index = currentMessages.firstIndex(where: { $0.id == messageId }),
+           var split = currentMessages[index].splitSheet {
+            split.collaboratorSigned = true
+            split.status = "signed"
+            currentMessages[index].splitSheet = split
+        }
+    }
+    
+    public func updateProposalStatus(messageId: String, status: String) {
+        if let index = currentMessages.firstIndex(where: { $0.id == messageId }),
+           var prop = currentMessages[index].proposal {
+            prop.jobStatus = status
+            currentMessages[index].proposal = prop
+        }
+    }
+    
+    public func sendVoiceNote(receiverId: String, duration: Double) {
+        let dummyWaveform: [Float] = [0.2, 0.5, 0.8, 0.4, 0.9, 0.7, 0.3, 0.6, 0.85, 0.5, 0.2]
+        let newMsg = ChatMessageModel(
+            id: UUID().uuidString,
+            sender: FirebaseService.shared.currentUserId,
+            receiver: receiverId,
+            message: "Nota de voz (\(Int(duration))s)",
+            timestamp: "Ahora",
+            type: .audio,
+            voiceDuration: duration,
+            waveform: dummyWaveform
+        )
+        currentMessages.append(newMsg)
+    }
+    
+    public func sendMediaImage(receiverId: String, imageUrl: String) {
+        let newMsg = ChatMessageModel(
+            id: UUID().uuidString,
+            sender: FirebaseService.shared.currentUserId,
+            receiver: receiverId,
+            message: "Fotografía adjunta",
+            timestamp: "Ahora",
+            type: .image,
+            mediaUrl: imageUrl
+        )
+        currentMessages.append(newMsg)
     }
 }
 
@@ -154,51 +289,5 @@ public class AIProfessorViewModel: ObservableObject {
         utterance.voice = AVSpeechSynthesisVoice(language: "es-MX")
         utterance.rate = 0.52
         speechSynthesizer.speak(utterance)
-    }
-}
-
-// MARK: - Practice Studio & Rewards ViewModel
-@MainActor
-public class PracticeStudioViewModel: ObservableObject {
-    @Published public var elapsedTimeSeconds: Int = 0
-    @Published public var isPracticeTimerRunning: Bool = false
-    @Published public var hasEarnedSessionReward: Bool = false
-    
-    private var timer: Timer?
-    private let firebaseService = FirebaseService.shared
-    
-    public var formattedTime: String {
-        let hours = elapsedTimeSeconds / 3600
-        let minutes = (elapsedTimeSeconds % 3600) / 60
-        let seconds = elapsedTimeSeconds % 60
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-    
-    public func toggleTimer() {
-        if isPracticeTimerRunning {
-            stopTimer()
-        } else {
-            startTimer()
-        }
-    }
-    
-    public func startTimer() {
-        isPracticeTimerRunning = true
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            self.elapsedTimeSeconds += 1
-            
-            // Android reward threshold: > 200 seconds ($1.00 balance reward)
-            if self.elapsedTimeSeconds >= 200 && !self.hasEarnedSessionReward {
-                self.hasEarnedSessionReward = true
-                self.firebaseService.addPracticeReward()
-            }
-        }
-    }
-    
-    public func stopTimer() {
-        isPracticeTimerRunning = false
-        timer?.invalidate()
-        timer = nil
     }
 }
