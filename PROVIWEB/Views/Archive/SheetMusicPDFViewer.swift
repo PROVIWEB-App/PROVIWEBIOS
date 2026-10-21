@@ -17,6 +17,14 @@ public struct SheetMusicPDFViewer: View {
     public init(score: SheetMusicItemModel) {
         self.score = score
     }
+
+    /// URL del PDF tolerante: si `pdfUrl` está vacío o mal formado no se produce un crash
+    /// (el visor muestra un aviso en lugar de forzar un `URL` inválido).
+    private var pdfDocumentURL: URL? {
+        let raw = score.pdfUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return nil }
+        return URL(string: raw)
+    }
     
     public var body: some View {
         ZStack(alignment: .bottom) {
@@ -73,7 +81,27 @@ public struct SheetMusicPDFViewer: View {
                 .background(Color.black.opacity(0.85))
                 
                 // Native PDF Reader Canvas
-                PDFKitViewRepresentable(url: URL(string: score.pdfUrl)!)
+                Group {
+                    if let pdfDocumentURL = pdfDocumentURL {
+                        PDFKitViewRepresentable(url: pdfDocumentURL)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        VStack(spacing: 10) {
+                            Image(systemName: "doc.text.magnifyingglass")
+                                .font(.system(size: 44))
+                                .foregroundColor(Color.gray)
+                            Text("Partitura no disponible")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            Text("Este documento no tiene un PDF asociado en el servidor.")
+                                .font(.caption)
+                                .foregroundColor(Color.gray)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(24)
+                    }
+                }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             

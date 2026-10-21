@@ -10,6 +10,9 @@ public struct BookingCalendarView: View {
     @State private var eventType: String = "Boda / Recepción"
     @State private var isSuccessAlert: Bool = false
     
+    // Callback opcional: devuelve la fecha elegida a la vista que lo presenta
+    public var onDateSelected: ((Date) -> Void)? = nil
+    
     let timeSlots = [
         "10:00 - 12:00",
         "12:00 - 14:00",
@@ -19,7 +22,9 @@ public struct BookingCalendarView: View {
         "22:00 - 00:00"
     ]
     
-    public init() {}
+    public init(onDateSelected: ((Date) -> Void)? = nil) {
+        self.onDateSelected = onDateSelected
+    }
     
     public var body: some View {
         NavigationView {
@@ -86,6 +91,7 @@ public struct BookingCalendarView: View {
                         
                         // Submit Booking Button
                         Button(action: {
+                            onDateSelected?(selectedDate)
                             isSuccessAlert = true
                         }) {
                             Text("Confirmar Solicitud de Reserva")

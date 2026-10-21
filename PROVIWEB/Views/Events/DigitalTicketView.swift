@@ -7,8 +7,30 @@ public struct DigitalTicketView: View {
     @ObservedObject private var walletService = Web3WalletService.shared
     @Environment(\.presentationMode) var presentationMode
     
+    @State private var isScannerPresented: Bool = false
+    @State private var scannedQRCode: String = ""
+    @State private var isScanResultPresented: Bool = false
+    
     public init(ticket: EventTicketModel) {
         self.ticket = ticket
+    }
+
+    // MARK: - Estado real de la entrada (check-in / finalizada / válida)
+    private var isEventFinished: Bool { ticket.eventDate < Date() }
+
+    private var ticketStateIcon: String {
+        if ticket.isValidated { return "checkmark.seal.fill" }
+        return isEventFinished ? "clock.badge.exclamationmark.fill" : "ticket.fill"
+    }
+
+    private var ticketStateLabel: String {
+        if ticket.isValidated { return "✓ ENTRADA ACCEDIDA" }
+        return isEventFinished ? "EVENTO FINALIZADO" : "✅ ENTRADA VÁLIDA"
+    }
+
+    private var ticketStateColor: Color {
+        if ticket.isValidated { return AppColors.gold }
+        return isEventFinished ? theme.textSecondary : AppColors.success
     }
     
     public var body: some View {
@@ -87,6 +109,20 @@ public struct DigitalTicketView: View {
                                     .foregroundColor(theme.textSecondary)
                                     .tracking(2)
                                 
+                                // Estado de la entrada (`checkedIn` escrito por Android en el check-in)
+                                // Tres estados reales: accedida / finalizada / válida.
+                                HStack(spacing: 6) {
+                                    Image(systemName: ticketStateIcon)
+                                    Text(ticketStateLabel)
+                                        .fontWeight(.bold)
+                                }
+                                .font(.caption)
+                                .foregroundColor(ticketStateColor)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(ticketStateColor.opacity(0.12))
+                                .cornerRadius(10)
+                                
                                 // Event Metadata Grid
                                 HStack(spacing: 20) {
                                     VStack(alignment: .leading, spacing: 4) {
@@ -134,6 +170,18 @@ public struct DigitalTicketView: View {
                                         .foregroundColor(theme.textSecondary)
                                         .lineLimit(2)
                                 }
+                                
+                                HStack(spacing: 8) {
+                                    Image(systemName: "creditcard.fill")
+                                        .foregroundColor(AppColors.gold)
+                                    Text(ticket.pricePaidUSD > 0
+                                         ? String(format: "Pagado: %.1f QAV", ticket.pricePaidUSD)
+                                         : "Acceso Libre")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(theme.textSecondary)
+                                    Spacer()
+                                }
                             }
                             .padding(20)
                         }
@@ -155,7 +203,41 @@ public struct DigitalTicketView: View {
                         .background(AppColors.success.opacity(0.1))
                         .cornerRadius(14)
                         .padding(.horizontal, 20)
+                        
+                        // Check-in Scanner Action (valida el QR de asistencia)
+                        Button(action: { isScannerPresented = true }) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "qrcode.viewfinder")
+                                    .font(.title3)
+                                Text("Escanear / Validar QR")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .background(AppColors.primary)
+                            .cornerRadius(16)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 8)
                     }
+                }
+                .fullScreenCover(isPresented: $isScannerPresented) {
+                    QRScannerView(onCodeScanned: { code in
+                        scannedQRCode = code
+                        isScanResultPresented = true
+                    })
+                }
+                .alert(isPresented: $isScanResultPresented) {
+                    Alert(
+                        title: Text("QR Escaneado"),
+                        message: Text("Código de check-in: \(scannedQRCode)"),
+                        dismissButton: .default(Text("OK"))
+                    )
                 }
             }
             .navigationTitle("Boleto Digital")
@@ -182,9 +264,14 @@ struct Line: Shape {
 // MARK: - My Tickets List View
 public struct MyTicketsListView: View {
     @ObservedObject private var theme = ThemeManager.shared
+    @ObservedObject private var eventsService = EventsService.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTicket: EventTicketModel? = nil
     
+    /// `true` con sesión real: las entradas se leen de `UserEventTickets/{uid}`
+    /// (mismo nodo que "Mis Boletos" en Android); en modo demo se muestra el seed local.
+    private let usesLiveEvents = FirebaseService.shared.canWriteToCloud
+
     @State private var sampleTickets: [EventTicketModel] = [
         EventTicketModel(
             ticketCode: "PRV-TCK-784210",
@@ -202,12 +289,18 @@ public struct MyTicketsListView: View {
     
     public init() {}
     
+    /// Entradas reales (con `qrPayload` de Android) o el seed de demostración.
+    private var displayTickets: [EventTicketModel] {
+        guard usesLiveEvents else { return sampleTickets }
+        return eventsService.myTickets.map { $0.asDisplayTicket() }
+    }
+    
     public var body: some View {
         NavigationView {
             ZStack {
                 theme.backgroundColor.ignoresSafeArea()
                 
-                if sampleTickets.isEmpty {
+                if displayTickets.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "ticket")
                             .font(.system(size: 48))
@@ -219,7 +312,7 @@ public struct MyTicketsListView: View {
                 } else {
                     ScrollView(showsIndicators: false) {
                         LazyVStack(spacing: 16) {
-                            ForEach(sampleTickets) { ticket in
+                            ForEach(displayTickets) { ticket in
                                 Button(action: { selectedTicket = ticket }) {
                                     HStack(spacing: 14) {
                                         ZStack {
@@ -242,10 +335,19 @@ public struct MyTicketsListView: View {
                                                 .font(.caption)
                                                 .foregroundColor(theme.textSecondary)
                                             
-                                            Text(ticket.seatTier)
-                                                .font(.caption2)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(AppColors.gold)
+                                            HStack(spacing: 6) {
+                                                Text(ticket.seatTier)
+                                                    .font(.caption2)
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(AppColors.gold)
+                                                
+                                                if ticket.isValidated {
+                                                    Text("✓ Accedida")
+                                                        .font(.caption2)
+                                                        .fontWeight(.bold)
+                                                        .foregroundColor(AppColors.success)
+                                                }
+                                            }
                                         }
                                         
                                         Spacer()
@@ -270,6 +372,11 @@ public struct MyTicketsListView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cerrar") { presentationMode.wrappedValue.dismiss() }
+                }
+            }
+            .onAppear {
+                if usesLiveEvents {
+                    eventsService.ensureStarted()
                 }
             }
             .sheet(item: $selectedTicket) { ticket in

@@ -10,6 +10,7 @@ public struct ProfileView: View {
     @State private var isSettingsPresented: Bool = false
     @State private var isSocialInsightsPresented: Bool = false
     @State private var socialInsightsTab: SocialInsightsView.InsightTab = .followers
+    @State private var isAchievementsPresented: Bool = false
     
     public init() {}
     
@@ -89,6 +90,22 @@ public struct ProfileView: View {
                                 }
                                 
                                 Button(action: {
+                                    isAchievementsPresented = true
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "trophy.fill")
+                                        Text("Logros")
+                                    }
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.gold)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(AppColors.gold.opacity(0.15))
+                                    .cornerRadius(20)
+                                }
+                                
+                                Button(action: {
                                     isThemeSelectorPresented = true
                                 }) {
                                     HStack(spacing: 6) {
@@ -163,6 +180,9 @@ public struct ProfileView: View {
             }
             .sheet(isPresented: $isVerificationSheetPresented) {
                 VerificationRequestView()
+            }
+            .sheet(isPresented: $isAchievementsPresented) {
+                AchievementsView()
             }
             .confirmationDialog("Selecciona el tema de PROVIWEB", isPresented: $isThemeSelectorPresented) {
                 Button("Oscuro (Night)") { theme.currentTheme = .night }

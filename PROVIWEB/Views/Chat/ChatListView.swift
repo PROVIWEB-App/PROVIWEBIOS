@@ -1,11 +1,20 @@
 import SwiftUI
+import UIKit
+import PhotosUI
 
 // MARK: - Chat List View
 public struct ChatListView: View {
     @StateObject private var viewModel = ChatViewModel()
     @ObservedObject private var theme = ThemeManager.shared
-    @State private var selectedChat: ChatModel? = nil
-    
+    @State private var searchText: String = ""
+
+    public init() {}
+
+    private var filteredChats: [ChatModel] {
+        guard !searchText.isEmpty else { return viewModel.chats }
+        return viewModel.chats.filter { $0.userName.localizedCaseInsensitiveContains(searchText) }
+    }
+
     public var body: some View {
         NavigationView {
             ZStack {
@@ -17,7 +26,7 @@ public struct ChatListView: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(theme.textSecondary)
-                        TextField("Buscar chats, artistas o grupos...", text: .constant(""))
+                        TextField("Buscar chats, artistas o grupos...", text: $searchText)
                     }
                     .padding(10)
                     .background(theme.cardColor)
@@ -25,19 +34,33 @@ public struct ChatListView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     
-                    List {
-                        ForEach(viewModel.chats) { chat in
-                            NavigationLink(destination: ChatConversationView(chat: chat)) {
-                                ChatRowView(chat: chat)
-                            }
-                            .listRowBackground(theme.cardColor)
+                    if filteredChats.isEmpty {
+                        VStack(spacing: 10) {
+                            Spacer()
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .font(.system(size: 44))
+                                .foregroundColor(theme.textSecondary)
+                            Text("Aún no tienes conversaciones")
+                                .font(.subheadline)
+                                .foregroundColor(theme.textSecondary)
+                            Spacer()
                         }
+                    } else {
+                        List {
+                            ForEach(filteredChats) { chat in
+                                NavigationLink(destination: ChatConversationView(chat: chat)) {
+                                    ChatRowView(chat: chat)
+                                }
+                                .listRowBackground(theme.cardColor)
+                            }
+                        }
+                        .listStyle(PlainListStyle())
                     }
-                    .listStyle(PlainListStyle())
                 }
             }
             .navigationTitle("Mensajes")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear { viewModel.openInbox() }
         }
     }
 }
@@ -65,6 +88,11 @@ struct ChatRowView: View {
                     Text(chat.userName)
                         .font(.headline)
                         .foregroundColor(theme.textPrimary)
+                    // Silenciado: `MutedChats/{miUid}/{otroUid}` (AdapterChatList pinta su campana tachada).
+                    if chat.isMuted == true {
+                        Text("🔕")
+                            .font(.caption)
+                    }
                     Spacer()
                     Text(chat.lastTimestamp ?? "")
                         .font(.caption2)
@@ -103,66 +131,92 @@ public struct ChatConversationView: View {
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var callKit = CallKitService.shared
     @State private var isVideoCallPresented: Bool = false
-    @State private var isSplitSheetCreatorPresented: Bool = false
-    @State private var isMediaPickerPresented: Bool = false
+    @State private var pickedPhoto: PhotosPickerItem? = nil
+    // Reacciones / silencio / bloqueo
+    @State private var reactionTarget: ChatMessageModel? = nil
+    @State private var isBlockConfirmPresented: Bool = false
+    @State private var isMuteConfirmPresented: Bool = false
+    @State private var demoAlertPresented: Bool = false
+    @State private var demoAlertMessage: String = ""
+    
+    /// Acciones nuevas (reacciones, silencio, bloqueo, historial de llamadas) requieren cuenta real.
+    @discardableResult
+    private func guardCloud(_ action: String) -> Bool {
+        guard viewModel.usesLiveChat else {
+            demoAlertMessage = "\(action) requiere una cuenta PROVIWEB activa. Inicia sesión para usarlo."
+            demoAlertPresented = true
+            return false
+        }
+        return true
+    }
     
     public var body: some View {
         VStack(spacing: 0) {
             // Chat Messages List
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(viewModel.currentMessages) { msg in
-                        MessageBubbleView(
-                            message: msg,
-                            onSignSplitSheet: {
-                                viewModel.signSplitSheet(messageId: msg.id)
-                            },
-                            onProposalStatusChanged: { status in
-                                viewModel.updateProposalStatus(messageId: msg.id, status: status)
-                            }
-                        )
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(viewModel.currentMessages) { msg in
+                            MessageBubbleView(
+                                message: msg,
+                                onReact: { message in reactionTarget = message },
+                                onDoubleTap: { message in
+                                    // Doble toque → ❤️ (AdapterChat.java:137-150). Sobrescribe, no borra.
+                                    guardCloud("Reaccionar a un mensaje")
+                                    viewModel.react(messageId: message.messageId ?? message.id, emoji: "❤️")
+                                }
+                            )
+                            .id(msg.id)
+                        }
                     }
+                    .padding(16)
                 }
-                .padding(16)
+                .onChange(of: viewModel.currentMessages.last?.id) { lastId in
+                    guard let lastId = lastId else { return }
+                    withAnimation { proxy.scrollTo(lastId, anchor: .bottom) }
+                }
+            }
+            
+            // Aviso de bloqueo (ChatActivity.checkBlockStatus: sin campo ni botón de envío).
+            if let notice = viewModel.blockedNotice {
+                HStack(spacing: 8) {
+                    Image(systemName: "nosign")
+                        .font(.caption)
+                    Text(notice)
+                        .font(.caption)
+                        .lineLimit(2)
+                }
+                .foregroundColor(AppColors.errorRed)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(theme.cardColor)
             }
             
             // Input Bar
-            HStack(spacing: 10) {
-                // Split Sheet Creator Action (Android DialogSplitSheetCreator equivalent)
-                Button(action: {
-                    isSplitSheetCreatorPresented = true
-                }) {
-                    Image(systemName: "doc.badge.plus")
-                        .font(.title3)
-                        .foregroundColor(AppColors.primary)
-                }
-                
-                // Photo Attachment Action
-                Button(action: {
-                    viewModel.sendMediaImage(
-                        receiverId: chat.userId,
-                        imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=60"
-                    )
-                }) {
+            HStack(spacing: 12) {
+                PhotosPicker(selection: $pickedPhoto, matching: .images) {
                     Image(systemName: "photo.on.rectangle.angled")
                         .font(.title3)
                         .foregroundColor(theme.textSecondary)
                 }
+                .disabled(viewModel.isChatBlocked)
                 
                 TextField("Escribe un mensaje...", text: $viewModel.messageText)
                     .padding(10)
                     .background(theme.cardColor)
                     .cornerRadius(20)
+                    .disabled(viewModel.isChatBlocked)
                 
                 if viewModel.messageText.isEmpty {
-                    // Voice Note Record & Send Action
                     Button(action: {
-                        viewModel.sendVoiceNote(receiverId: chat.userId, duration: 4.5)
+                        viewModel.isRecordingAudio.toggle()
                     }) {
                         Image(systemName: "mic.fill")
                             .font(.title3)
-                            .foregroundColor(AppColors.chatPrimary)
+                            .foregroundColor(viewModel.isRecordingAudio ? AppColors.errorRed : AppColors.chatPrimary)
                     }
+                    .disabled(viewModel.isChatBlocked)
                 } else {
                     Button(action: {
                         viewModel.sendMessage(receiverId: chat.userId)
@@ -171,14 +225,98 @@ public struct ChatConversationView: View {
                             .font(.title3)
                             .foregroundColor(AppColors.chatPrimary)
                     }
+                    .disabled(viewModel.isChatBlocked)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .background(theme.backgroundColor)
+            .opacity(viewModel.isChatBlocked ? 0.6 : 1.0)
         }
         .background(theme.backgroundColor)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear { viewModel.openThread(with: chat.userId) }
+        .onDisappear { viewModel.closeThread() }
+        .onChange(of: pickedPhoto) { item in
+            guard let item = item else { return }
+            let receiverId = chat.userId
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self) {
+                    viewModel.sendImage(receiverId: receiverId, imageData: data)
+                }
+                pickedPhoto = nil
+            }
+        }
+        // Selector de reacciones (bottom-sheet de emojis, ChatActivity.java:630-638).
+        .sheet(item: $reactionTarget) { message in
+            VStack(spacing: 16) {
+                Text("Reaccionar al mensaje")
+                    .font(.headline)
+                    .foregroundColor(theme.textPrimary)
+                Text(message.message)
+                    .font(.caption)
+                    .foregroundColor(theme.textSecondary)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                HStack(spacing: 20) {
+                    ForEach(["❤️", "👍", "😂", "😮", "😢", "🔥"], id: \.self) { emoji in
+                        Button(action: {
+                            reactionTarget = nil
+                            guardCloud("Reaccionar a un mensaje")
+                            viewModel.react(messageId: message.messageId ?? message.id, emoji: emoji)
+                        }) {
+                            Text(emoji)
+                                .font(.system(size: 34))
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+            .padding(.vertical, 24)
+            .frame(maxWidth: .infinity)
+            .background(theme.backgroundColor)
+        }
+        // Confirmación para bloquear/desbloquear (en español, como el AlertDialog de Android).
+        .alert(
+            viewModel.isBlockedByMe ? "Desbloquear usuario" : "¿Bloquear a \(chat.userName)?",
+            isPresented: $isBlockConfirmPresented
+        ) {
+            Button("Cancelar", role: .cancel) {}
+            Button(viewModel.isBlockedByMe ? "Desbloquear" : "Bloquear", role: .destructive) {
+                guardCloud("Bloquear usuarios")
+                viewModel.toggleBlock(otherUid: chat.userId)
+            }
+        } message: {
+            if viewModel.isBlockedByMe {
+                Text("¿Desbloquear a \(chat.userName)? Podrás volver a enviarle mensajes.")
+            } else {
+                Text("¿Bloquear a \(chat.userName)? No podrá enviarte mensajes en este chat y tú no podrás escribirle hasta desbloquearlo.")
+            }
+        }
+        // Confirmación para silenciar/activar notificaciones.
+        .alert(
+            viewModel.mutedUids.contains(chat.userId) ? "Activar notificaciones" : "¿Silenciar el chat con \(chat.userName)?",
+            isPresented: $isMuteConfirmPresented
+        ) {
+            Button("Cancelar", role: .cancel) {}
+            Button(viewModel.mutedUids.contains(chat.userId) ? "Activar" : "Silenciar") {
+                guardCloud("Silenciar chats")
+                viewModel.toggleMute(otherUid: chat.userId)
+            }
+        } message: {
+            if viewModel.mutedUids.contains(chat.userId) {
+                Text("¿Volver a recibir notificaciones de \(chat.userName)?")
+            } else {
+                Text("Dejarás de recibir notificaciones de nuevos mensajes de \(chat.userName). El chat seguirá recibiendo mensajes.")
+            }
+        }
+        // Modo demo: aviso de que la función necesita cuenta real.
+        .alert("Función no disponible", isPresented: $demoAlertPresented) {
+            Button("Entendido", role: .cancel) {}
+        } message: {
+            Text(demoAlertMessage)
+        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 8) {
@@ -198,44 +336,63 @@ public struct ChatConversationView: View {
                 HStack(spacing: 16) {
                     Button(action: {
                         callKit.startCall(callerName: chat.userName, isVideo: false)
+                        viewModel.registerCallAttempt(to: chat.userId, isVideo: false)
                     }) {
                         Image(systemName: "phone.fill")
                             .foregroundColor(AppColors.chatPrimary)
                     }
+                    .disabled(viewModel.isChatBlocked)
                     
                     Button(action: {
                         callKit.startCall(callerName: chat.userName, isVideo: true)
+                        viewModel.registerCallAttempt(to: chat.userId, isVideo: true)
                     }) {
                         Image(systemName: "video.fill")
+                            .foregroundColor(AppColors.chatPrimary)
+                    }
+                    .disabled(viewModel.isChatBlocked)
+                    
+                    // Menú del hilo (bottom-sheet_chat_menu de Android): silencio y bloqueo.
+                    Menu {
+                        Button(action: {
+                            if guardCloud("Silenciar chats") {
+                                isMuteConfirmPresented = true
+                            }
+                        }) {
+                            Label(
+                                viewModel.mutedUids.contains(chat.userId) ? "Activar notificaciones" : "Silenciar chat",
+                                systemImage: viewModel.mutedUids.contains(chat.userId) ? "bell.fill" : "bell.slash"
+                            )
+                        }
+                        
+                        Button(role: .destructive, action: {
+                            if guardCloud("Bloquear usuarios") {
+                                isBlockConfirmPresented = true
+                            }
+                        }) {
+                            Label(
+                                viewModel.isBlockedByMe ? "Desbloquear usuario" : "Bloquear usuario",
+                                systemImage: "nosign"
+                            )
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                             .foregroundColor(AppColors.chatPrimary)
                     }
                 }
             }
         }
-        .sheet(isPresented: $isSplitSheetCreatorPresented) {
-            SplitSheetCreatorSheet(collaboratorId: chat.userId, collaboratorName: chat.userName) { title, genre, myRole, myPct, collabRole, collabPct in
-                viewModel.sendSplitSheet(
-                    receiverId: chat.userId,
-                    collaboratorName: chat.userName,
-                    songTitle: title,
-                    genre: genre,
-                    creatorRole: myRole,
-                    creatorPercent: myPct,
-                    collaboratorRole: collabRole,
-                    collaboratorPercent: collabPct
-                )
-            }
-        }
     }
 }
 
-// MARK: - Message Bubble View with Split-Sheet, Job Proposal, Audio Waveform & Images
+// MARK: - Message Bubble View
 struct MessageBubbleView: View {
     let message: ChatMessageModel
-    var onSignSplitSheet: (() -> Void)? = nil
-    var onProposalStatusChanged: ((String) -> Void)? = nil
+    /// Abre el selector de emojis (menú contextual → "Reaccionar").
+    var onReact: ((ChatMessageModel) -> Void)? = nil
+    /// Doble toque → ❤️ (AdapterChat.java:137-150).
+    var onDoubleTap: ((ChatMessageModel) -> Void)? = nil
     @ObservedObject private var theme = ThemeManager.shared
-    @State private var isPlayingAudio: Bool = false
     
     var isCurrentUser: Bool {
         message.sender == FirebaseService.shared.currentUserId
@@ -246,356 +403,116 @@ struct MessageBubbleView: View {
             if isCurrentUser { Spacer() }
             
             VStack(alignment: isCurrentUser ? .trailing : .leading, spacing: 4) {
-                switch message.type {
-                case .splitSheet:
-                    // Interactive Split Sheet Card (Android DialogSplitSheetCreator)
-                    if let split = message.splitSheet {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Image(systemName: "doc.text.fill")
-                                    .foregroundColor(AppColors.gold)
-                                Text("ACUERDO SPLIT SHEET")
-                                    .font(.caption2)
-                                    .fontWeight(.black)
-                                    .tracking(1)
-                                    .foregroundColor(AppColors.gold)
-                                Spacer()
-                                Text(split.status == "signed" ? "FIRMADO ✅" : "PENDIENTE ✍️")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(split.status == "signed" ? AppColors.success.opacity(0.2) : AppColors.warningOrange.opacity(0.2))
-                                    .foregroundColor(split.status == "signed" ? AppColors.success : AppColors.warningOrange)
-                                    .cornerRadius(6)
-                            }
-                            
-                            Text(split.songTitle)
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundColor(theme.textPrimary)
-                            
-                            Text("Género: \(split.genre)")
+                content
+                // Reacciones agrupadas ("❤️ 2"), AdapterChat.java:161-176.
+                if !message.groupedReactions.isEmpty {
+                    HStack(spacing: 4) {
+                        ForEach(message.groupedReactions, id: \.emoji) { item in
+                            Text("\(item.emoji) \(item.count)")
                                 .font(.caption2)
-                                .foregroundColor(theme.textSecondary)
-                            
-                            Divider()
-                            
-                            // Creator %
-                            HStack {
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(split.creatorName)
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(theme.textPrimary)
-                                    Text(split.creatorRole)
-                                        .font(.caption2)
-                                        .foregroundColor(theme.textSecondary)
-                                }
-                                Spacer()
-                                Text("\(split.creatorPercentage)%")
-                                    .font(.headline)
-                                    .fontWeight(.black)
-                                    .foregroundColor(AppColors.primary)
-                                Image(systemName: split.creatorSigned ? "checkmark.seal.fill" : "circle")
-                                    .foregroundColor(AppColors.success)
-                            }
-                            
-                            // Collaborator %
-                            HStack {
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(split.collaboratorName)
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(theme.textPrimary)
-                                    Text(split.collaboratorRole)
-                                        .font(.caption2)
-                                        .foregroundColor(theme.textSecondary)
-                                }
-                                Spacer()
-                                Text("\(split.collaboratorPercentage)%")
-                                    .font(.headline)
-                                    .fontWeight(.black)
-                                    .foregroundColor(AppColors.primary)
-                                Image(systemName: split.collaboratorSigned ? "checkmark.seal.fill" : "pencil.circle")
-                                    .foregroundColor(split.collaboratorSigned ? AppColors.success : AppColors.warningOrange)
-                            }
-                            
-                            // Hash Fingerprint
-                            Text("Certificado SHA-256: \(split.digitalCertificateHash.prefix(12))...")
-                                .font(.system(size: 9, design: .monospaced))
-                                .foregroundColor(theme.textSecondary)
-                            
-                            // Sign Button if not signed
-                            if !split.collaboratorSigned {
-                                Button(action: {
-                                    onSignSplitSheet?()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "signature")
-                                        Text("Firmar Acuerdo Digitalmente")
-                                            .fontWeight(.bold)
-                                    }
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(AppColors.primary)
-                                    .cornerRadius(10)
-                                }
-                            }
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(theme.cardColor)
+                                .clipShape(Capsule())
                         }
-                        .padding(14)
-                        .background(theme.cardColor)
-                        .cornerRadius(18)
-                        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
-                        .frame(maxWidth: 300)
                     }
-                    
-                case .proposal:
-                    // Interactive Gig Proposal Card (Android JobProposal in Chat)
-                    if let prop = message.proposal {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Image(systemName: "briefcase.fill")
-                                    .foregroundColor(AppColors.primary)
-                                Text("CONTRATO MUSICAL")
-                                    .font(.caption2)
-                                    .fontWeight(.black)
-                                    .tracking(1)
-                                    .foregroundColor(AppColors.primary)
-                                Spacer()
-                                Text(prop.jobStatus)
-                                    .font(.system(size: 9, weight: .bold))
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(prop.jobStatus == "ACCEPTED" ? AppColors.success.opacity(0.2) : (prop.jobStatus == "REJECTED" ? AppColors.errorRed.opacity(0.2) : AppColors.warningOrange.opacity(0.2)))
-                                    .foregroundColor(prop.jobStatus == "ACCEPTED" ? AppColors.success : (prop.jobStatus == "REJECTED" ? AppColors.errorRed : AppColors.warningOrange))
-                                    .cornerRadius(6)
-                            }
-                            
-                            Text(prop.jobRole)
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundColor(theme.textPrimary)
-                            
-                            VStack(alignment: .leading, spacing: 3) {
-                                Label(prop.jobEvent, systemImage: "music.note.house")
-                                Label(prop.jobDate, systemImage: "calendar")
-                                Label(prop.jobLocation, systemImage: "mappin.and.ellipse")
-                            }
-                            .font(.caption)
-                            .foregroundColor(theme.textSecondary)
-                            
-                            if let details = prop.jobDetails {
-                                Text(details)
-                                    .font(.caption2)
-                                    .foregroundColor(theme.textSecondary)
-                                    .padding(8)
-                                    .background(theme.backgroundColor.opacity(0.6))
-                                    .cornerRadius(8)
-                            }
-                            
-                            HStack {
-                                Text("Honorarios:")
-                                    .font(.caption)
-                                    .foregroundColor(theme.textSecondary)
-                                Spacer()
-                                Text("$\(Int(prop.jobPrice)) \(prop.jobCurrency)")
-                                    .font(.title3)
-                                    .fontWeight(.black)
-                                    .foregroundColor(AppColors.success)
-                            }
-                            
-                            if prop.jobStatus == "PENDING" {
-                                HStack(spacing: 10) {
-                                    Button(action: {
-                                        onProposalStatusChanged?("REJECTED")
-                                    }) {
-                                        Text("Declinar")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(AppColors.errorRed)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 8)
-                                            .background(AppColors.errorRed.opacity(0.12))
-                                            .cornerRadius(8)
-                                    }
-                                    
-                                    Button(action: {
-                                        onProposalStatusChanged?("ACCEPTED")
-                                    }) {
-                                        Text("Aceptar Contrato")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.white)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 8)
-                                            .background(AppColors.success)
-                                            .cornerRadius(8)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(14)
-                        .background(theme.cardColor)
-                        .cornerRadius(18)
-                        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
-                        .frame(maxWidth: 300)
-                    }
-                    
-                case .audio:
-                    // Interactive Voice Note Bubble with waveform
-                    HStack(spacing: 12) {
-                        Button(action: {
-                            isPlayingAudio.toggle()
-                        }) {
-                            Image(systemName: isPlayingAudio ? "pause.circle.fill" : "play.circle.fill")
-                                .font(.title)
-                                .foregroundColor(isCurrentUser ? .white : AppColors.primary)
-                        }
-                        
-                        // Animated Waveform Bars
-                        HStack(spacing: 3) {
-                            ForEach(0..<(message.waveform?.count ?? 8), id: \.self) { i in
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(isCurrentUser ? Color.white.opacity(0.9) : AppColors.primary.opacity(0.8))
-                                    .frame(width: 4, height: CGFloat(10 + (i * 4) % 24))
-                            }
-                        }
-                        
-                        Text(String(format: "0:%02d", Int(message.voiceDuration ?? 4.0)))
-                            .font(.caption2)
-                            .foregroundColor(isCurrentUser ? .white.opacity(0.8) : theme.textSecondary)
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(isCurrentUser ? AppColors.chatPrimary : theme.cardColor)
-                    .cornerRadius(18)
-                    
-                case .image:
-                    // Image attachment bubble
-                    if let media = message.mediaUrl, let url = URL(string: media) {
-                        AsyncImage(url: url) { img in
-                            img.resizable().scaledToFill()
-                        } placeholder: {
-                            Rectangle().fill(Color.gray.opacity(0.2))
-                        }
-                        .frame(width: 220, height: 160)
-                        .cornerRadius(14)
-                        .clipped()
-                    }
-                    
-                default:
-                    // Standard Text Message Bubble
-                    Text(message.message)
-                        .font(.body)
-                        .foregroundColor(isCurrentUser ? .white : theme.textPrimary)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(isCurrentUser ? AppColors.chatPrimary : theme.cardColor)
-                        .cornerRadius(18)
-                }
-                
-                Text(message.timestamp ?? "")
-                    .font(.caption2)
-                    .foregroundColor(theme.textSecondary)
                     .padding(.horizontal, 4)
+                }
+                HStack(spacing: 4) {
+                    Text(ChatService.formatMillis(message.timestamp ?? "0"))
+                        .font(.caption2)
+                        .foregroundColor(theme.textSecondary)
+                    // Check de leído con la misma semántica visual que AdapterChat.java (alpha 1.0 / 0.5).
+                    if isCurrentUser {
+                        Image(systemName: (message.isSeen ?? false) ? "checkmark.circle.fill" : "checkmark.circle")
+                            .font(.caption2)
+                            .foregroundColor((message.isSeen ?? false) ? AppColors.chatPrimary : theme.textSecondary)
+                    }
+                }
+                .padding(.horizontal, 4)
             }
             
             if !isCurrentUser { Spacer() }
         }
-    }
-}
-
-// MARK: - Split Sheet Creator Modal (DialogSplitSheetCreator.java equivalent)
-struct SplitSheetCreatorSheet: View {
-    let collaboratorId: String
-    let collaboratorName: String
-    let onCreated: (String, String, String, Int, String, Int) -> Void
-    
-    @ObservedObject private var theme = ThemeManager.shared
-    @Environment(\.presentationMode) var presentationMode
-    
-    @State private var songTitle: String = ""
-    @State private var genre: String = "Música Clásica / Mariachi"
-    @State private var creatorRole: String = "Compositor & 1er Violín"
-    @State private var collaboratorRole: String = "Arreglista / Cello"
-    @State private var creatorPercentage: Double = 50.0
-    
-    var collaboratorPercentage: Double {
-        100.0 - creatorPercentage
-    }
-    
-    var body: some View {
-        NavigationView {
-            ZStack {
-                theme.backgroundColor.ignoresSafeArea()
-                
-                Form {
-                    Section(header: Text("Información de la Obra Musical")) {
-                        TextField("Título de la Canción u Obra", text: $songTitle)
-                        TextField("Género", text: $genre)
-                    }
-                    
-                    Section(header: Text("Tus Datos (Creador)")) {
-                        TextField("Tu Rol en la Obra", text: $creatorRole)
-                        HStack {
-                            Text("Tu Porcentaje:")
-                            Spacer()
-                            Text("\(Int(creatorPercentage))%")
-                                .fontWeight(.bold)
-                                .foregroundColor(AppColors.primary)
-                        }
-                        Slider(value: $creatorPercentage, in: 1...99, step: 1)
-                    }
-                    
-                    Section(header: Text("Datos del Colaborador (\(collaboratorName))")) {
-                        TextField("Rol del Colaborador", text: $collaboratorRole)
-                        HStack {
-                            Text("Porcentaje Colaborador:")
-                            Spacer()
-                            Text("\(Int(collaboratorPercentage))%")
-                                .fontWeight(.bold)
-                                .foregroundColor(AppColors.gold)
-                        }
-                    }
-                    
-                    Section(footer: Text("Al generar el acuerdo, se calculará un hash criptográfico SHA-256 inmutable vinculado a los usuarios.")) {
-                        Button(action: {
-                            guard !songTitle.isEmpty else { return }
-                            onCreated(
-                                songTitle,
-                                genre,
-                                creatorRole,
-                                Int(creatorPercentage),
-                                collaboratorRole,
-                                Int(collaboratorPercentage)
-                            )
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "checkmark.seal.fill")
-                                Text("Generar y Firmar Split Sheet ✍️")
-                                    .fontWeight(.bold)
-                                Spacer()
-                            }
-                            .foregroundColor(.white)
-                            .padding(.vertical, 4)
-                        }
-                        .listRowBackground(AppColors.primary)
-                        .disabled(songTitle.isEmpty)
-                    }
-                }
+        // Doble toque → reacción rápida ❤️.
+        .onTapGesture(count: 2) {
+            onDoubleTap?(message)
+        }
+        // Menú contextual: reaccionar (selector de emojis) o copiar.
+        .contextMenu {
+            Button(action: {
+                onReact?(message)
+            }) {
+                Label("Reaccionar", systemImage: "face.smiling")
             }
-            .navigationTitle("Nuevo Split Sheet")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { presentationMode.wrappedValue.dismiss() }
-                }
+            
+            Button(action: {
+                UIPasteboard.general.string = message.message
+            }) {
+                Label("Copiar", systemImage: "doc.on.doc")
             }
         }
     }
+    
+    @ViewBuilder
+    private var content: some View {
+        switch message.type {
+        case .image:
+            AsyncImage(url: URL(string: message.message)) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().aspectRatio(contentMode: .fill)
+                default:
+                    ZStack {
+                        theme.cardColor
+                        Image(systemName: "photo")
+                            .foregroundColor(theme.textSecondary)
+                    }
+                }
+            }
+            .frame(maxWidth: 220, maxHeight: 260)
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+        case .location:
+            HStack(spacing: 10) {
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.title3)
+                    .foregroundColor(AppColors.errorRed)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Ubicación compartida")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(isCurrentUser ? .white : theme.textPrimary)
+                    Text(message.message)
+                        .font(.caption)
+                        .foregroundColor(isCurrentUser ? .white.opacity(0.85) : theme.textSecondary)
+                        .lineLimit(2)
+                }
+            }
+            .padding(12)
+            .background(isCurrentUser ? AppColors.chatPrimary : theme.cardColor)
+            .cornerRadius(18)
+        case .voiceCall, .audioCall, .videoCall, .callMissed, .call:
+            // Burbuja de llamada (Android pinta icono + texto para los tipos *_call).
+            HStack(spacing: 8) {
+                Image(systemName: message.type == .callMissed ? "phone.down.fill" : (message.type == .videoCall ? "video.fill" : "phone.fill"))
+                    .font(.subheadline)
+                    .foregroundColor(isCurrentUser ? .white.opacity(0.9) : AppColors.chatPrimary)
+                Text(message.message)
+                    .font(.subheadline)
+                    .foregroundColor(isCurrentUser ? .white : theme.textPrimary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(isCurrentUser ? AppColors.chatPrimary : theme.cardColor)
+            .cornerRadius(18)
+        default:
+            Text(message.message)
+                .font(.body)
+                .foregroundColor(isCurrentUser ? .white : theme.textPrimary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(isCurrentUser ? AppColors.chatPrimary : theme.cardColor)
+                .cornerRadius(18)
+        }
+    }
 }
-

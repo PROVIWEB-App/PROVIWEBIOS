@@ -17,6 +17,7 @@ public struct MainTabView: View {
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var chatVM = ChatViewModel()
     @ObservedObject private var callKit = CallKitService.shared
+    @ObservedObject private var firebaseService = FirebaseService.shared
     
     public enum TabItem {
         case home
@@ -105,6 +106,25 @@ public struct MainTabView: View {
                 ActiveCallOverlayView()
                     .transition(.move(edge: .bottom))
                     .zIndex(100)
+            }
+
+            // Indicador de modo demostración (QA / revisión sin credenciales)
+            if firebaseService.isDemoMode {
+                VStack {
+                    Text("Estás navegando en modo demostración")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(AppColors.primary.opacity(0.85))
+                        .cornerRadius(20)
+                        .padding(.top, 6)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .allowsHitTesting(false)
+                .zIndex(50)
             }
         }
         .sheet(isPresented: $isCreateModalPresented) {

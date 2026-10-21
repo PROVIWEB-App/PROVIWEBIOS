@@ -89,6 +89,8 @@ public enum LiveMode: String, Codable {
 }
 
 // MARK: - Marketplace Product
+// Mapea `Product/{pId}` de Android: `description`↔`des`, `category`↔`cat`,
+// `condition`↔`type`, `images`↔`photo`+`photos`, `price` es String en Android (se parsea).
 public struct ProductModel: Identifiable, Codable, Hashable {
     public var id: String
     public var title: String
@@ -102,6 +104,9 @@ public struct ProductModel: Identifiable, Codable, Hashable {
     public var latitude: Double?
     public var longitude: Double?
     public var condition: String // "Nuevo", "Como Nuevo", "Usado"
+    public var currency: String // USD/EUR/COP/MXN
+    public var isPromoted: Bool
+    public var timestamp: String?
     
     public init(
         id: String = UUID().uuidString,
@@ -115,7 +120,10 @@ public struct ProductModel: Identifiable, Codable, Hashable {
         location: String = "",
         latitude: Double? = nil,
         longitude: Double? = nil,
-        condition: String = "Nuevo"
+        condition: String = "Nuevo",
+        currency: String = "USD",
+        isPromoted: Bool = false,
+        timestamp: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -129,6 +137,9 @@ public struct ProductModel: Identifiable, Codable, Hashable {
         self.latitude = latitude
         self.longitude = longitude
         self.condition = condition
+        self.currency = currency
+        self.isPromoted = isPromoted
+        self.timestamp = timestamp
     }
 }
 
@@ -177,6 +188,14 @@ public struct WalletBalanceModel: Codable, Hashable {
     public var referralCount: Int
     public var walletAddress: String?
     public var privateKeyHash: String?
+
+    /// Espejo local del nodo RTDB `Balance/{uid}/balance` (saldo de la wallet, el mismo
+    /// que Android debita en pagos QAV). El nombre histórico `balanceUSD` se conserva por
+    /// compatibilidad con las vistas de cartera existentes.
+    public var balanceQav: Double {
+        get { balanceUSD }
+        set { balanceUSD = newValue }
+    }
     
     public init(
         balanceUSD: Double = 0.0,

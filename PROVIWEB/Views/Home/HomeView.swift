@@ -13,7 +13,9 @@ public struct HomeView: View {
     @State private var isNotificationsPresented: Bool = false
     @State private var isJobBoardPresented: Bool = false
     @State private var isSheetMusicArchivePresented: Bool = false
-    
+
+    public init() {}
+
     public var body: some View {
         NavigationView {
             ZStack {
@@ -198,11 +200,29 @@ public struct HomeView: View {
                         // Feed Content
                         if viewModel.selectedTab == .posts {
                             LazyVStack(spacing: 16) {
-                                ForEach(viewModel.posts) { post in
-                                    PostCardView(
-                                        post: post,
-                                        onLike: { viewModel.toggleLike(for: post) }
-                                    )
+                                // Posts normales + anuncios pagados (AdsPost) intercalados
+                                // con la cadencia de Android: 1 anuncio arriba + 1 cada 4 posts.
+                                ForEach(viewModel.feedItems) { item in
+                                    switch item {
+                                    case .post(let post):
+                                        PostCardView(
+                                            post: post,
+                                            onLike: { viewModel.toggleLike(for: post) }
+                                        )
+                                    case .ad(let ad):
+                                        AdCardView(
+                                            ad: ad,
+                                            targetPost: ad.type == "post" && !ad.pId.isEmpty
+                                                ? viewModel.posts.first(where: { $0.id == ad.pId || $0.pId == ad.pId })
+                                                : nil,
+                                            onTap: { viewModel.registerAdImpression(ad) }
+                                        )
+                                        .onAppear {
+                                            // AdapterAdsPost.java:137-143 cuenta la impresión al mostrar
+                                            // la tarjeta (registerAdImpression deduplica por sesión).
+                                            viewModel.registerAdImpression(ad)
+                                        }
+                                    }
                                 }
                             }
                             .padding(.horizontal, 16)
@@ -281,6 +301,130 @@ public struct HomeView: View {
                 SheetMusicArchiveView()
             }
         }
+    }
+}
+
+// MARK: - Ad Card (anuncio pagado del nodo RTDB `AdsPost`)
+// Réplica visual de AdapterAdsPost.java: etiqueta "Patrocinado", tipos text/image/video/post.
+struct AdCardView: View {
+    let ad: AdPostModel
+    /// Post real a abrir cuando `type == "post"` (navegación al detalle).
+    let targetPost: PostModel?
+    /// Se invoca al tocar el anuncio (incremento de impresiones `pViews`).
+    let onTap: () -> Void
+
+    @ObservedObject private var theme = ThemeManager.shared
+    @State private var isPostDetailPresented: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Patrocinado")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(theme.textSecondary)
+                Spacer()
+                Image(systemName: "megaphone.fill")
+                    .font(.caption2)
+                    .foregroundColor(AppColors.gold)
+            }
+
+            if !ad.text.isEmpty {
+                Text(ad.text)
+                    .font(.subheadline)
+                    .foregroundColor(theme.textPrimary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            media
+        }
+        .padding(14)
+        .background(theme.cardColor)
+        .cornerRadius(16)
+        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .onTapGesture {
+            onTap()
+            if ad.type == "post", targetPost != nil {
+                isPostDetailPresented = true
+            }
+        }
+        .sheet(isPresented: $isPostDetailPresented) {
+            if let targetPost = targetPost {
+                DetailPostView(post: targetPost)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var media: some View {
+        switch ad.type {
+        case "image":
+            if let url = ad.imageURL {
+                AsyncImage(url: url) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Rectangle().fill(AppColors.primary.opacity(0.12))
+                }
+                .frame(height: 180)
+                .cornerRadius(12)
+                .clipped()
+            } else {
+                placeholderBanner(systemImage: "photo", message: "Imagen no disponible")
+            }
+        case "video":
+            // Aviso de video con portada (cover) si existe; si no, fondo degradado.
+            ZStack {
+                if let url = ad.imageURL {
+                    AsyncImage(url: url) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Rectangle().fill(AppColors.primaryGradient)
+                    }
+                } else {
+                    Rectangle().fill(AppColors.primaryGradient)
+                }
+
+                Image(systemName: "play.circle.fill")
+                    .font(.system(size: 44))
+                    .foregroundColor(.white.opacity(0.95))
+
+                VStack {
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Image(systemName: "video.fill")
+                        Text("Video promocional")
+                    }
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.black.opacity(0.45))
+                    .cornerRadius(8)
+                }
+                .padding(10)
+            }
+            .frame(height: 180)
+            .cornerRadius(12)
+            .clipped()
+        default:
+            // Tipos "text" y "post": solo texto (la navegación del "post" la gestiona el tap).
+            EmptyView()
+        }
+    }
+
+    private func placeholderBanner(systemImage: String, message: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .foregroundColor(AppColors.primary)
+            Text(message)
+                .font(.caption)
+                .foregroundColor(theme.textSecondary)
+            Spacer()
+        }
+        .padding(14)
+        .background(AppColors.primary.opacity(0.08))
+        .cornerRadius(12)
     }
 }
 

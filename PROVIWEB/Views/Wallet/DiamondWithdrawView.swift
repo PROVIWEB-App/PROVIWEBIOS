@@ -11,6 +11,8 @@ public struct DiamondWithdrawView: View {
     @State private var accountDetails: String = ""
     @State private var isSuccessAlert: Bool = false
     
+    public init() {}
+    
     public var body: some View {
         NavigationView {
             ZStack {

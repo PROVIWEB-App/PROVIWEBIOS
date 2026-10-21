@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -28,6 +28,8 @@
 	<string>PROVIWEB requiere acceso al micrófono para la detección de afinación en tiempo real, grabación de notas de voz, práctica musical y llamadas.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>PROVIWEB requiere acceso a tu galería para subir fotos, vídeos y portadas de canciones.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>PROVIWEB necesita permiso para guardar tus fotos, vídeos y publicaciones en la galería del dispositivo.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>PROVIWEB utiliza tu ubicación para mostrarte músicos, profesores y eventos musicales cercanos a ti en el mapa.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
@@ -50,7 +52,7 @@
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -75,6 +77,16 @@
 				<string>proviweb</string>
 				<string>wc</string>
 				<string>com.israviolink.ios</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>REVERSED_CLIENT_ID</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.475963980955-1q62qiiki0fkasdsvhpikgdgp5r00vto</string>
 			</array>
 		</dict>
 	</array>

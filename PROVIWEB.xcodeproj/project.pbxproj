@@ -40,7 +40,7 @@
 		A10031 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10031 /* LoginView.swift */; };
 		A10032 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10032 /* Assets.xcassets */; };
 		A10033 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B10033 /* GoogleService-Info.plist */; };
-		A10034 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B10034 /* Localizable.strings */; };
+		A10034 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A10090 /* Localizable.strings */; };
 		A10035 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10036 /* AnalyticsService.swift */; };
 		A10036 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10037 /* NetworkMonitor.swift */; };
 		A10037 /* InAppReviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10038 /* InAppReviewService.swift */; };
@@ -128,8 +128,9 @@
 		B10031 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Auth/LoginView.swift"; sourceTree = "<group>"; };
 		B10032 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B10033 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = GoogleService-Info.plist; sourceTree = "<group>"; };
-		B10034 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "Localizable.strings"; path = "es.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B10034 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		B10035 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B10090 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		B10036 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		B10037 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		B10038 /* InAppReviewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppReviewService.swift; sourceTree = "<group>"; };
@@ -416,7 +417,7 @@
 		D10010 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				B10034 /* Localizable.strings */,
+				A10090 /* Localizable.strings */,
 				B10060 /* LaunchScreen.storyboard */,
 				B10061 /* Sounds */,
 			);
@@ -615,6 +616,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A10090 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B10034 /* es */,
+				B10090 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		R10001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {

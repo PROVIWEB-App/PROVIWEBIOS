@@ -5,7 +5,9 @@ public struct MiniPlayerOverlay: View {
     @ObservedObject private var player = AudioPlayerService.shared
     @ObservedObject private var theme = ThemeManager.shared
     @State private var isFullPlayerPresented: Bool = false
-    
+
+    public init() {}
+
     public var body: some View {
         if player.isMiniPlayerVisible, let song = player.currentSong {
             VStack(spacing: 0) {

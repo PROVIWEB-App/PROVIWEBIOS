@@ -49,6 +49,9 @@ public class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotification
         // 4. Setup Push Notifications
         setupPushNotifications(application: application)
         
+        // 5. Arranque de la sesión (listener de Auth + sincronización en vivo del RTDB)
+        FirebaseService.shared.bootstrap()
+        
         return true
     }
     
@@ -66,7 +69,7 @@ public class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotification
     }
     
     public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
+        let tokenParts = deviceToken.map { data in String(format: "%02x", data) }
         let token = tokenParts.joined()
         print("FCM / APNs Device Token registrado: \(token)")
         

@@ -50,7 +50,7 @@ Desarrollada en **Swift 5.9+ / iOS 16.0+** utilizando **SwiftUI, Combine, AVFoun
 - **Reproductor de Música Global** (`MusicPlayerView` & `AudioPlayerService`): Mini-player flotante persistente, soporte para bloqueo con `MPNowPlayingInfoCenter` y exploración de canciones (`MusicExploreView`).
 
 ### 8. 💬 Mensajería & Llamadas VoIP (CallKit)
-- **Chat Realtime** (`ChatListView` & `ChatViewModel`): Mensajes de texto, notas de voz grabadas con forma de onda, fotografías e insignias.
+- **Chat Realtime interoperable con Android** (`ChatService`, `ChatListView` & `ChatViewModel`): sincronizado con los nodos `Chats` y `Chatlist` de Firebase (mismo esquema que Android), bandeja en vivo, no leídos, marcar como leído, envío de texto y fotos (subidas a `chat_photo/`), y representación de tipos (imagen, ubicación, sticker…).
 - **Llamadas de Audio y Video** (`CallKitService`): Integración con el framework nativo de telefonía de iOS (CallKit) para responder llamadas directamente desde la pantalla de bloqueo.
 
 ### 9. 💎 Monedero QAV & Cripto Web3
@@ -116,3 +116,12 @@ PROVIWEBIOS/
 2. Los paquetes de **Firebase iOS SDK** se resolverán automáticamente mediante Swift Package Manager (SPM).
 3. Selecciona tu simulador (ej. *iPhone 16 Pro* o *iPad Pro*) o un dispositivo físico iOS.
 4. Presiona **Cmd + R** (Product > Run) para compilar y lanzar la aplicación.
+
+---
+
+## 📦 Documentación de entrega
+
+- **[MIGRATION_REPORT.md](MIGRATION_REPORT.md)** — informe completo de la migración Android → iOS: auth real Firebase, esquema RTDB interoperable, flujo de aprobación de menores, navegaciones conectadas, correcciones y resultados de verificación estática.
+- **[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)** — checklist de firma, QA y publicación en App Store para el equipo humano.
+- **`scripts/check-integrity.ps1`** — verificación estática reproducible (balance de código, vistas sin `init()`, pbxproj, iconos, scheme).
+- **`scripts/generate-appicon.ps1`** — regenera el `AppIcon.appiconset` (PNG sin alfa) a partir del logo de Android.

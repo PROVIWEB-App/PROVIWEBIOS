@@ -4,8 +4,13 @@ import SwiftUI
 public struct CreateEventView: View {
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var firebase = FirebaseService.shared
+    @ObservedObject private var eventsService = EventsService.shared
     @Environment(\.presentationMode) var presentationMode
     
+    /// `true` con sesión real: el evento se escribe en `ArtisticEvents` (esquema Android);
+    /// en modo demo se mantiene la creación local de siempre.
+    private let usesLiveEvents = FirebaseService.shared.canWriteToCloud
+
     public var onEventCreated: (ArtisticEventModel) -> Void
     
     @State private var title: String = ""
@@ -19,6 +24,8 @@ public struct CreateEventView: View {
     @State private var capacityText: String = "150"
     @State private var isFree: Bool = false
     @State private var isLiveStreamed: Bool = true
+    @State private var isSaving: Bool = false
+    @State private var createErrorMessage: String? = nil
     
     public init(onEventCreated: @escaping (ArtisticEventModel) -> Void) {
         self.onEventCreated = onEventCreated
@@ -65,7 +72,7 @@ public struct CreateEventView: View {
                         Toggle("Evento Gratuito", isOn: $isFree)
                         
                         if !isFree {
-                            TextField("Precio Entrada (USD)", text: $ticketPriceText)
+                            TextField("Precio Entrada (QAV)", text: $ticketPriceText)
                                 .keyboardType(.decimalPad)
                         }
                         
@@ -77,14 +84,14 @@ public struct CreateEventView: View {
                     
                     Section {
                         Button(action: saveEvent) {
-                            Text("Publicar Evento")
+                            Text(isSaving ? "Publicando..." : "Publicar Evento")
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)
                         }
-                        .disabled(title.isEmpty || venueName.isEmpty)
-                        .listRowBackground(title.isEmpty ? Color.gray : AppColors.primary)
+                        .disabled(title.isEmpty || venueName.isEmpty || isSaving)
+                        .listRowBackground(title.isEmpty || venueName.isEmpty || isSaving ? Color.gray : AppColors.primary)
                     }
                 }
             }
@@ -95,12 +102,23 @@ public struct CreateEventView: View {
                     Button("Cancelar") { presentationMode.wrappedValue.dismiss() }
                 }
             }
+            .alert(isPresented: Binding(
+                get: { createErrorMessage != nil },
+                set: { if !$0 { createErrorMessage = nil } }
+            )) {
+                Alert(
+                    title: Text("No se pudo publicar"),
+                    message: Text(createErrorMessage ?? "Error desconocido."),
+                    dismissButton: .default(Text("Entendido"))
+                )
+            }
         }
     }
     
     private func saveEvent() {
         let price = isFree ? 0.0 : (Double(ticketPriceText) ?? 20.0)
         let capacity = Int(capacityText) ?? 100
+        let nowMillis = Date().timeIntervalSince1970 * 1000
         
         let newEvent = ArtisticEventModel(
             title: title,
@@ -118,10 +136,57 @@ public struct CreateEventView: View {
             totalCapacity: capacity,
             ticketsSold: 0,
             isFree: isFree,
-            isLiveStreamed: isLiveStreamed
+            isLiveStreamed: isLiveStreamed,
+            status: .upcoming,
+            schedule: [],
+            collaborators: [],
+            creatorUsername: firebase.currentUser?.username ?? "",
+            categoryRaw: category.rawValue,
+            mediaType: "image",
+            eventType: "presencial",
+            accessType: "publico",
+            eventDateText: EventsService.readableDateFormatter.string(from: eventDate),
+            eventTime: EventsService.timeFormatter.string(from: eventDate),
+            eventTimestamp: nowMillis,
+            onlinePlatform: "",
+            paymentMethod: isFree ? "free" : "qav",
+            priceQav: price,
+            purchaseLink: "",
+            createdAt: nowMillis,
+            rawStatus: "active"
         )
         
-        onEventCreated(newEvent)
-        presentationMode.wrappedValue.dismiss()
+        // Sesión real → escribe el nodo completo `ArtisticEvents/{pushKey}` (esquema Android).
+        guard usesLiveEvents else {
+            // Modo demo → experiencia local de siempre.
+            onEventCreated(newEvent)
+            presentationMode.wrappedValue.dismiss()
+            return
+        }
+        
+        isSaving = true
+        eventsService.createEvent(
+            title: title,
+            description: description,
+            categoryRaw: category.rawValue,
+            eventDate: eventDate,
+            venueName: venueName,
+            address: address,
+            isFree: isFree,
+            priceQav: price,
+            maxCapacity: capacity,
+            // Esta vista no tiene selector de imagen: se publica sin portada (coverUrl vacío),
+            // igual que Android cuando no elige medios.
+            coverUrl: ""
+        ) { result in
+            self.isSaving = false
+            switch result {
+            case .success(let event):
+                self.onEventCreated(event)
+                self.presentationMode.wrappedValue.dismiss()
+            case .failure(let message):
+                self.createErrorMessage = message
+            }
+        }
     }
 }

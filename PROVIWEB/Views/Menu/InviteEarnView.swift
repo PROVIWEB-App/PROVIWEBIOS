@@ -6,7 +6,9 @@ public struct InviteEarnView: View {
     @ObservedObject private var firebaseService = FirebaseService.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var isCopied: Bool = false
-    
+
+    public init() {}
+
     public var body: some View {
         NavigationView {
             ZStack {

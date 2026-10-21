@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - Sheet Music Archive & Score Library View
 public struct SheetMusicArchiveView: View {
     @ObservedObject private var theme = ThemeManager.shared
+    @ObservedObject private var firebaseService = FirebaseService.shared
     @Environment(\.presentationMode) var presentationMode
     
     @State private var selectedGenre: SheetMusicItemModel.MusicalGenre? = nil
@@ -10,7 +11,9 @@ public struct SheetMusicArchiveView: View {
     @State private var searchText: String = ""
     @State private var selectedScoreForViewer: SheetMusicItemModel? = nil
     
-    @State private var scores: [SheetMusicItemModel] = [
+    /// Semilla local: se muestra como "Ejemplos" cuando el nodo `books` está vacío
+    /// (modo demo / sin sesión / base sin datos).
+    private let exampleScores: [SheetMusicItemModel] = [
         SheetMusicItemModel(
             title: "Czardas",
             composer: "Vittorio Monti",
@@ -108,6 +111,71 @@ public struct SheetMusicArchiveView: View {
     
     public init() {}
     
+    /// Catálogo real (`books` del nodo de Android). Si está vacío se muestran los ejemplos.
+    private var scores: [SheetMusicItemModel] {
+        firebaseService.books.isEmpty
+            ? exampleScores
+            : firebaseService.books.map(Self.score(from:))
+    }
+    
+    /// `true` cuando no hay datos reales en la nube (la lista es la semilla de ejemplo).
+    private var isShowingExamples: Bool { firebaseService.books.isEmpty }
+    
+    /// `BookModel` (nodo `books`, esquema de ArchiveActivity.java) → partitura navegable.
+    private static func score(from book: BookModel) -> SheetMusicItemModel {
+        // `type` ("books", "booksViolin", "booksMGuitarra"...) + categoría del nodo.
+        let tags = "\(book.bookType ?? "") \(book.category ?? "")".lowercased()
+        
+        let instrument: SheetMusicItemModel.MusicalInstrument
+        if tags.contains("violonchelo") || tags.contains("cello") {
+            instrument = .violoncello
+        } else if tags.contains("viola") {
+            instrument = .viola
+        } else if tags.contains("violin") {
+            instrument = .violin
+        } else if tags.contains("guitarra") {
+            instrument = .guitarra
+        } else if tags.contains("piano") {
+            instrument = .piano
+        } else if tags.contains("trompeta") {
+            instrument = .trompeta
+        } else if tags.contains("flauta") {
+            instrument = .flauta
+        } else {
+            instrument = .scoreGeneral
+        }
+        
+        let genre: SheetMusicItemModel.MusicalGenre
+        if tags.contains("mariachi") {
+            genre = .mariachi
+        } else if tags.contains("banda") {
+            genre = .banda
+        } else if tags.contains("jazz") {
+            genre = .jazz
+        } else if tags.contains("popular") || tags.contains("pop") {
+            genre = .popular
+        } else {
+            genre = .classical
+        }
+        
+        return SheetMusicItemModel(
+            id: book.id,
+            title: book.title,
+            composer: book.author,
+            genre: genre,
+            instrument: instrument,
+            // Los libros de Android no traen tonalidad ni nº de páginas: se omiten en la fila.
+            keySignature: "",
+            tempoBpm: book.estimatedBpm ?? 0,
+            pagesCount: 0,
+            // `content` de Android es la URL del PDF (visor existente SheetMusicPDFViewer).
+            pdfUrl: book.pdfUrl ?? "",
+            coverImageUrl: book.coverUrl,
+            downloadCount: 0,
+            tags: [book.category ?? "Partituras"]
+        )
+    }
+    
     public var filteredScores: [SheetMusicItemModel] {
         scores.filter { score in
             let matchesGenre = selectedGenre == nil || score.genre == selectedGenre
@@ -134,9 +202,15 @@ public struct SheetMusicArchiveView: View {
                                 .foregroundColor(theme.textPrimary)
                         }
                         
-                        Text("Biblioteca de Partituras")
-                            .font(.headline)
-                            .foregroundColor(theme.textPrimary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Biblioteca de Partituras")
+                                .font(.headline)
+                                .foregroundColor(theme.textPrimary)
+                            
+                            Text(isShowingExamples ? "Ejemplos de la colección" : "Partituras de la comunidad PROVIWEB")
+                                .font(.caption2)
+                                .foregroundColor(theme.textSecondary)
+                        }
                         
                         Spacer()
                         
@@ -232,6 +306,8 @@ public struct SheetMusicArchiveView: View {
                         LazyVStack(spacing: 14) {
                             ForEach(filteredScores) { score in
                                 SheetMusicRowItem(score: score) {
+                                    // Solo abre el visor si hay PDF real (nodo `content` de Android).
+                                    guard !score.pdfUrl.isEmpty else { return }
                                     selectedScoreForViewer = score
                                 }
                             }
@@ -286,30 +362,36 @@ struct SheetMusicRowItem: View {
                             .fontWeight(.semibold)
                             .foregroundColor(AppColors.primary)
                         
-                        Text("•")
-                            .font(.caption2)
-                            .foregroundColor(theme.textSecondary)
+                        if !score.keySignature.isEmpty {
+                            Text("•")
+                                .font(.caption2)
+                                .foregroundColor(theme.textSecondary)
+                            
+                            Text(score.keySignature)
+                                .font(.caption2)
+                                .foregroundColor(theme.textSecondary)
+                        }
                         
-                        Text(score.keySignature)
-                            .font(.caption2)
-                            .foregroundColor(theme.textSecondary)
-                        
-                        Text("•")
-                            .font(.caption2)
-                            .foregroundColor(theme.textSecondary)
-                        
-                        Text("\(score.tempoBpm) BPM")
-                            .font(.caption2)
-                            .foregroundColor(AppColors.gold)
+                        if score.tempoBpm > 0 {
+                            Text("•")
+                                .font(.caption2)
+                                .foregroundColor(theme.textSecondary)
+                            
+                            Text("\(score.tempoBpm) BPM")
+                                .font(.caption2)
+                                .foregroundColor(AppColors.gold)
+                        }
                     }
                 }
                 
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 6) {
-                    Text("\(score.pagesCount) pág.")
-                        .font(.caption2)
-                        .foregroundColor(theme.textSecondary)
+                    if score.pagesCount > 0 {
+                        Text("\(score.pagesCount) pág.")
+                            .font(.caption2)
+                            .foregroundColor(theme.textSecondary)
+                    }
                     
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.title3)

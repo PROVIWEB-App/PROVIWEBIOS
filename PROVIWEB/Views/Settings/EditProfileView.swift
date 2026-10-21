@@ -1,9 +1,11 @@
 import SwiftUI
+import PhotosUI
 
 // MARK: - Edit User Profile View
 public struct EditProfileView: View {
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var firebase = FirebaseService.shared
+    @ObservedObject private var uploads = UploadManager.shared
     @Environment(\.presentationMode) var presentationMode
     
     @State private var name: String = ""
@@ -14,6 +16,7 @@ public struct EditProfileView: View {
     @State private var phone: String = ""
     @State private var location: String = ""
     @State private var isSavedAlert: Bool = false
+    @State private var pickedPhoto: PhotosPickerItem? = nil
     
     public init() {}
     
@@ -28,11 +31,20 @@ public struct EditProfileView: View {
                             Spacer()
                             VStack(spacing: 8) {
                                 AvatarView(urlString: firebase.currentUser?.image, size: 80, isVerified: true)
-                                Button(action: {}) {
-                                    Text("Cambiar Foto")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(AppColors.primary)
+                                PhotosPicker(selection: $pickedPhoto, matching: .images) {
+                                    HStack(spacing: 4) {
+                                        if uploads.isUploading {
+                                            ProgressView()
+                                        } else {
+                                            Image(systemName: "camera.fill")
+                                        }
+                                        Text(uploads.isUploading
+                                             ? "Subiendo... \(Int(uploads.uploadProgress * 100))%"
+                                             : "Cambiar Foto")
+                                    }
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(AppColors.primary)
                                 }
                             }
                             Spacer()
@@ -88,6 +100,20 @@ public struct EditProfileView: View {
                     location = u.location ?? "CDMX"
                 }
             }
+            .onChange(of: pickedPhoto) { item in
+                guard let item = item else { return }
+                Task {
+                    guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+                    // Ruta Storage idéntica a EditProfileActivity.uploadDp() en Android.
+                    let millis = "\(Int(Date().timeIntervalSince1970 * 1000))"
+                    uploads.uploadData(data: data, path: "profile_photo/\(millis)", mimeType: "image/jpeg") { result in
+                        if case .success(let url) = result {
+                            firebase.updateProfilePhotoURL(url)
+                        }
+                    }
+                    pickedPhoto = nil
+                }
+            }
             .alert(isPresented: $isSavedAlert) {
                 Alert(
                     title: Text("¡Perfil Actualizado!"),
@@ -108,6 +134,8 @@ public struct EditProfileView: View {
         firebase.currentUser?.experienceYears = experienceYears
         firebase.currentUser?.phone = phone
         firebase.currentUser?.location = location
+        // Persistir en `Users/{uid}` (el observer local vuelve a sobrescribir currentUser en refetch).
+        firebase.saveCurrentUserProfile()
         isSavedAlert = true
     }
 }

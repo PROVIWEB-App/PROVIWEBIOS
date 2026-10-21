@@ -1,20 +1,18 @@
 import SwiftUI
 import MapKit
+import PhotosUI
 
-// MARK: - Marketplace & Musician Hiring View (LocationActivity & Marketplace)
+// MARK: - Marketplace & Musician Hiring View
 public struct MarketplaceView: View {
     @StateObject private var viewModel = MarketplaceViewModel()
     @ObservedObject private var locationService = LocationService.shared
     @ObservedObject private var theme = ThemeManager.shared
-    
     @State private var isHireSheetPresented: Bool = false
     @State private var isMusicalHubPresented: Bool = false
     @State private var isQuotesManagerPresented: Bool = false
-    @State private var isFullRadarPresented: Bool = false
-    @State private var selectedMusicianPin: NearbyMusicianPin? = nil
-    
+
     public init() {}
-    
+
     public var body: some View {
         NavigationView {
             ZStack {
@@ -45,118 +43,54 @@ public struct MarketplaceView: View {
                         }
                         .padding(.top, 12)
                         
-                        // Nearby Musicians Radar / Map Card (LocationActivity)
+                        // Nearby Musicians Radar / Map Card (datos reales de `UserLocation`)
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Image(systemName: "location.fill")
                                     .foregroundColor(AppColors.primary)
-                                Text("Radar Musical en Vivo (GPS)")
+                                Text("Músicos y Artistas Cerca de Ti")
                                     .font(.headline)
                                     .foregroundColor(theme.textPrimary)
                                 Spacer()
-                                Button(action: { isFullRadarPresented = true }) {
-                                    HStack(spacing: 4) {
-                                        Text("Explorar Radar")
-                                        Image(systemName: "chevron.right")
-                                    }
+                                Text("\(locationService.nearbyMusicians.count) Cercanos")
                                     .font(.caption)
                                     .fontWeight(.bold)
                                     .foregroundColor(AppColors.primary)
-                                }
                             }
                             
-                            // Interactive Map with Pins
-                            ZStack(alignment: .bottom) {
-                                Map(coordinateRegion: $locationService.region, annotationItems: locationService.allMusicians) { pin in
-                                    MapAnnotation(coordinate: pin.coordinate) {
-                                        Button(action: {
-                                            selectedMusicianPin = pin
-                                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                        }) {
-                                            VStack(spacing: 2) {
-                                                Circle()
-                                                    .fill(pin.category == "Mariachi" ? AppColors.gold : AppColors.primary)
-                                                    .frame(width: 32, height: 32)
-                                                    .overlay(
-                                                        Text(pinCategoryEmoji(pin.category))
-                                                            .font(.system(size: 16))
-                                                    )
-                                                    .shadow(radius: 4)
-                                                
-                                                Text(pin.name.prefix(12))
-                                                    .font(.system(size: 8, weight: .bold))
-                                                    .padding(.horizontal, 4)
-                                                    .padding(.vertical, 1)
-                                                    .background(Color.white.opacity(0.9))
-                                                    .foregroundColor(.black)
-                                                    .cornerRadius(4)
+                            Map(coordinateRegion: $locationService.region,
+                                annotationItems: locationService.nearbyMusicians) { musician in
+                                MapAnnotation(coordinate: musician.coordinate) {
+                                    VStack(spacing: 2) {
+                                        if let photo = musician.photo, !photo.isEmpty, let url = URL(string: photo) {
+                                            AsyncImage(url: url) { img in
+                                                img.resizable().aspectRatio(contentMode: .fill)
+                                            } placeholder: {
+                                                Image(systemName: "person.circle.fill")
+                                                    .foregroundColor(AppColors.primary)
                                             }
+                                            .frame(width: 34, height: 34)
+                                            .clipShape(Circle())
+                                        } else {
+                                            Image(systemName: "person.circle.fill")
+                                                .font(.title3)
+                                                .foregroundColor(AppColors.primary)
+                                                .background(Circle().fill(Color.white))
                                         }
+                                        Text(musician.name)
+                                            .font(.caption2)
+                                            .fontWeight(.semibold)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.white)
+                                            .cornerRadius(8)
+                                            .shadow(color: .black.opacity(0.15), radius: 2)
                                     }
                                 }
-                                .frame(height: 200)
-                                .cornerRadius(16)
-                                
-                                // Selected Pin Quick Card
-                                if let selected = selectedMusicianPin {
-                                    HStack(spacing: 12) {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            HStack(spacing: 4) {
-                                                Text(selected.name)
-                                                    .font(.caption)
-                                                    .fontWeight(.bold)
-                                                    .foregroundColor(theme.textPrimary)
-                                                if selected.isVerified {
-                                                    Image(systemName: "checkmark.seal.fill")
-                                                        .font(.system(size: 10))
-                                                        .foregroundColor(AppColors.infoBlue)
-                                                }
-                                            }
-                                            
-                                            Text("\(String(format: "%.1f km", selected.distanceKm)) • $\(Int(selected.pricePerHourUSD))/hr")
-                                                .font(.caption2)
-                                                .foregroundColor(theme.textSecondary)
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Button(action: {
-                                            isHireSheetPresented = true
-                                        }) {
-                                            Text("Cotizar")
-                                                .font(.caption2)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.white)
-                                                .padding(.horizontal, 10)
-                                                .padding(.vertical, 6)
-                                                .background(AppColors.primary)
-                                                .cornerRadius(10)
-                                        }
-                                        
-                                        Button(action: { selectedMusicianPin = nil }) {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .font(.caption)
-                                                .foregroundColor(theme.textSecondary)
-                                        }
-                                    }
-                                    .padding(10)
-                                    .background(theme.cardColor)
-                                    .cornerRadius(12)
-                                    .shadow(radius: 5)
-                                    .padding(8)
-                                }
                             }
-                            
-                            HStack {
-                                Text("\(locationService.nearbyMusiciansCount) Artistas dentro de \(Int(locationService.radarRadiusKm)) km")
-                                    .font(.caption2)
-                                    .foregroundColor(theme.textSecondary)
-                                Spacer()
-                                Text(locationService.isNearMusiciansAlert ? "¡Músico a menos de 500m!" : "Radar Activo")
-                                    .font(.caption2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(locationService.isNearMusiciansAlert ? AppColors.success : AppColors.primary)
-                            }
+                            .frame(height: 180)
+                            .cornerRadius(16)
+                            .disabled(true)
                         }
                         .padding(16)
                         .background(theme.cardColor)
@@ -200,17 +134,44 @@ public struct MarketplaceView: View {
                         
                         // Products Grid
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Instrumentos y Accesorios")
-                                .font(.headline)
-                                .foregroundColor(theme.textPrimary)
-                                .padding(.horizontal, 16)
-                            
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                                ForEach(viewModel.products) { prod in
-                                    ProductCardView(product: prod)
+                            HStack {
+                                Text("Instrumentos y Accesorios")
+                                    .font(.headline)
+                                    .foregroundColor(theme.textPrimary)
+                                Spacer()
+                                if viewModel.usesLiveMarket {
+                                    Button(action: { viewModel.isPostProductPresented = true }) {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "plus.circle.fill")
+                                            Text("Publicar")
+                                                .font(.caption)
+                                                .fontWeight(.semibold)
+                                        }
+                                        .foregroundColor(AppColors.primary)
+                                    }
                                 }
                             }
                             .padding(.horizontal, 16)
+                            
+                            if viewModel.filteredProducts.isEmpty {
+                                VStack(spacing: 8) {
+                                    Image(systemName: "cart.empty")
+                                        .font(.system(size: 36))
+                                        .foregroundColor(theme.textSecondary)
+                                    Text("No hay productos publicados todavía")
+                                        .font(.subheadline)
+                                        .foregroundColor(theme.textSecondary)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 28)
+                            } else {
+                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                    ForEach(viewModel.filteredProducts) { prod in
+                                        ProductCardView(product: prod)
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                            }
                         }
                         .padding(.bottom, 32)
                     }
@@ -240,228 +201,9 @@ public struct MarketplaceView: View {
             .sheet(isPresented: $isQuotesManagerPresented) {
                 MusicalQuotesManagerView()
             }
-            .sheet(isPresented: $isFullRadarPresented) {
-                MusicalRadarFullMapView()
+            .sheet(isPresented: $viewModel.isPostProductPresented) {
+                PostProductView()
             }
-        }
-    }
-    
-    private func pinCategoryEmoji(_ category: String) -> String {
-        switch category {
-        case "Mariachi": return "🎻"
-        case "Violinista Solista": return "🎻"
-        case "Cuarteto de Cuerdas": return "🎼"
-        case "Banda Regional": return "🎺"
-        case "Estudio de Grabación": return "🎙️"
-        default: return "🎶"
-        }
-    }
-}
-
-// MARK: - Musical Radar Full Map View (LocationActivity 1:1)
-public struct MusicalRadarFullMapView: View {
-    @ObservedObject private var locationService = LocationService.shared
-    @ObservedObject private var theme = ThemeManager.shared
-    @Environment(\.presentationMode) var presentationMode
-    
-    @State private var selectedCategory: String = "Todos"
-    @State private var selectedMusician: NearbyMusicianPin? = nil
-    @State private var isQuoteModalPresented: Bool = false
-    
-    let categories = ["Todos", "Mariachi", "Violinista Solista", "Cuarteto de Cuerdas", "Banda Regional", "Estudio de Grabación"]
-    
-    public var body: some View {
-        NavigationView {
-            ZStack {
-                theme.backgroundColor.ignoresSafeArea()
-                
-                VStack(spacing: 0) {
-                    // Category Bar
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(categories, id: \.self) { cat in
-                                Button(action: { selectedCategory = cat }) {
-                                    Text(cat)
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(selectedCategory == cat ? .white : theme.textPrimary)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 7)
-                                        .background(selectedCategory == cat ? AppColors.primary : theme.cardColor)
-                                        .cornerRadius(14)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                    }
-                    .background(theme.cardColor)
-                    
-                    // Radar Radius Slider Bar
-                    HStack(spacing: 12) {
-                        Image(systemName: "antenna.radiowaves.left.and.right")
-                            .foregroundColor(AppColors.primary)
-                        Text("Radio:")
-                            .font(.caption)
-                            .foregroundColor(theme.textSecondary)
-                        Text("\(Int(locationService.radarRadiusKm)) km")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(AppColors.primary)
-                        
-                        Slider(value: Binding(
-                            get: { locationService.radarRadiusKm },
-                            set: { locationService.updateRadarRadius($0) }
-                        ), in: 1...50, step: 1)
-                        .accentColor(AppColors.primary)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(theme.backgroundColor)
-                    
-                    // Map View
-                    ZStack(alignment: .bottom) {
-                        Map(
-                            coordinateRegion: $locationService.region,
-                            annotationItems: locationService.musicians(forCategory: selectedCategory)
-                        ) { pin in
-                            MapAnnotation(coordinate: pin.coordinate) {
-                                Button(action: {
-                                    selectedMusician = pin
-                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                }) {
-                                    VStack(spacing: 2) {
-                                        Circle()
-                                            .fill(pin.category == "Mariachi" ? AppColors.gold : AppColors.primary)
-                                            .frame(width: 36, height: 36)
-                                            .overlay(
-                                                Text(pinCategoryEmoji(pin.category))
-                                                    .font(.system(size: 18))
-                                            )
-                                            .shadow(color: Color.black.opacity(0.3), radius: 4)
-                                        
-                                        Text(pin.name)
-                                            .font(.system(size: 9, weight: .bold))
-                                            .padding(.horizontal, 6)
-                                            .padding(.vertical, 2)
-                                            .background(Color.white.opacity(0.95))
-                                            .foregroundColor(.black)
-                                            .cornerRadius(6)
-                                            .shadow(radius: 2)
-                                    }
-                                }
-                            }
-                        }
-                        .ignoresSafeArea(edges: .bottom)
-                        
-                        // Selected Pin Full Detail Card
-                        if let musician = selectedMusician {
-                            VStack(spacing: 10) {
-                                HStack(spacing: 12) {
-                                    Circle()
-                                        .fill(AppColors.primaryGradient)
-                                        .frame(width: 44, height: 44)
-                                        .overlay(
-                                            Text(musician.name.prefix(1))
-                                                .font(.headline)
-                                                .foregroundColor(.white)
-                                        )
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        HStack(spacing: 6) {
-                                            Text(musician.name)
-                                                .font(.subheadline)
-                                                .fontWeight(.bold)
-                                                .foregroundColor(theme.textPrimary)
-                                            if musician.isVerified {
-                                                Image(systemName: "checkmark.seal.fill")
-                                                    .foregroundColor(AppColors.infoBlue)
-                                                    .font(.caption2)
-                                            }
-                                        }
-                                        
-                                        Text(musician.directorName.isEmpty ? musician.category : "\(musician.directorName) • \(musician.category)")
-                                            .font(.caption2)
-                                            .foregroundColor(theme.textSecondary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: { selectedMusician = nil }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(theme.textSecondary)
-                                    }
-                                }
-                                
-                                HStack {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "star.fill")
-                                            .foregroundColor(AppColors.gold)
-                                        Text(String(format: "%.1f (%d)", musician.rating, musician.reviewsCount))
-                                            .font(.caption2)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(theme.textPrimary)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Text("\(String(format: "%.1f km", musician.distanceKm)) de ti")
-                                        .font(.caption2)
-                                        .foregroundColor(AppColors.primary)
-                                    
-                                    Spacer()
-                                    
-                                    Text(String(format: "$%.0f USD / hora", musician.pricePerHourUSD))
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(AppColors.success)
-                                }
-                                
-                                Button(action: { isQuoteModalPresented = true }) {
-                                    HStack {
-                                        Image(systemName: "doc.text.fill")
-                                        Text("Solicitar Cotización Inmediata")
-                                    }
-                                    .font(.subheadline)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background(AppColors.primary)
-                                    .cornerRadius(12)
-                                }
-                            }
-                            .padding(16)
-                            .background(theme.cardColor)
-                            .cornerRadius(20)
-                            .shadow(radius: 10)
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 20)
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Radar de Músicos")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cerrar") { presentationMode.wrappedValue.dismiss() }
-                }
-            }
-            .sheet(isPresented: $isQuoteModalPresented) {
-                HireMusicianQuoteView()
-            }
-        }
-    }
-    
-    private func pinCategoryEmoji(_ category: String) -> String {
-        switch category {
-        case "Mariachi": return "🎻"
-        case "Violinista Solista": return "🎻"
-        case "Cuarteto de Cuerdas": return "🎼"
-        case "Banda Regional": return "🎺"
-        case "Estudio de Grabación": return "🎙️"
-        default: return "🎶"
         }
     }
 }
@@ -503,6 +245,149 @@ struct ProductCardView: View {
         .background(theme.cardColor)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
+}
+
+// MARK: - Publicar Producto (PostProductActivity.java en Android)
+public struct PostProductView: View {
+    @ObservedObject private var theme = ThemeManager.shared
+    @ObservedObject private var uploads = UploadManager.shared
+    @Environment(\.presentationMode) var presentationMode
+
+    @State private var title: String = ""
+    @State private var priceText: String = ""
+    @State private var description: String = ""
+    @State private var category: String = "Instrumentos"
+    @State private var condition: String = "Nuevo"
+    @State private var location: String = ""
+    @State private var pickedPhoto: PhotosPickerItem? = nil
+    @State private var photoData: Data? = nil
+    @State private var isPublished: Bool = false
+
+    private let categoryOptions = ["Instrumentos", "Accesorios", "Partituras", "Agrupaciones", "Servicios"]
+    private let conditionOptions = ["Nuevo", "Como Nuevo", "Usado"]
+
+    public init() {}
+
+    public var body: some View {
+        NavigationView {
+            ZStack {
+                theme.backgroundColor.ignoresSafeArea()
+
+                Form {
+                    Section(header: Text("Fotografía")) {
+                        PhotosPicker(selection: $pickedPhoto, matching: .images) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "camera.fill")
+                                    .foregroundColor(AppColors.primary)
+                                Text(photoData == nil ? "Elegir foto del producto" : "Foto seleccionada")
+                                    .foregroundColor(theme.textPrimary)
+                                Spacer()
+                                if photoData != nil {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(AppColors.success)
+                                }
+                            }
+                        }
+                    }
+
+                    Section(header: Text("Producto")) {
+                        TextField("Título", text: $title)
+                        TextField("Precio (USD)", text: $priceText)
+                            .keyboardType(.decimalPad)
+                        TextEditor(text: $description)
+                            .frame(height: 80)
+                    }
+
+                    Section(header: Text("Clasificación")) {
+                        Picker("Categoría", selection: $category) {
+                            ForEach(categoryOptions, id: \.self) { Text($0) }
+                        }
+                        Picker("Estado", selection: $condition) {
+                            ForEach(conditionOptions, id: \.self) { Text($0) }
+                        }
+                    }
+
+                    Section(header: Text("Envío")) {
+                        TextField("Ciudad / Dirección", text: $location)
+                    }
+
+                    Section {
+                        Button(action: publish) {
+                            HStack {
+                                if uploads.isUploading {
+                                    ProgressView()
+                                }
+                                Text(uploads.isUploading
+                                     ? "Subiendo foto... \(Int(uploads.uploadProgress * 100))%"
+                                     : "Publicar en Marketplace")
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                        }
+                        .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty
+                                  || priceText.trimmingCharacters(in: .whitespaces).isEmpty
+                                  || uploads.isUploading)
+                        .listRowBackground(AppColors.primary)
+                    }
+                }
+            }
+            .navigationTitle("Nuevo Producto")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { presentationMode.wrappedValue.dismiss() }
+                }
+            }
+            .onChange(of: pickedPhoto) { item in
+                guard let item = item else { return }
+                Task {
+                    photoData = try? await item.loadTransferable(type: Data.self)
+                }
+            }
+            .alert("¡Producto Publicado!", isPresented: $isPublished) {
+                Button("Aceptar") { presentationMode.wrappedValue.dismiss() }
+            } message: {
+                Text("Tu producto ya es visible en el Marketplace de PROVIWEB.")
+            }
+        }
+    }
+
+    private func publish() {
+        let millis = "\(Int(Date().timeIntervalSince1970 * 1000))"
+        let finish = { [title, priceText, description, category, condition, location] in
+            MarketplaceService.shared.postProduct(
+                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                price: priceText.trimmingCharacters(in: .whitespacesAndNewlines),
+                description: description.trimmingCharacters(in: .whitespacesAndNewlines),
+                category: category,
+                condition: condition,
+                location: location.trimmingCharacters(in: .whitespacesAndNewlines),
+                photoURL: nil
+            )
+            isPublished = true
+        }
+        // Ruta Storage idéntica a PostProductActivity.java: `product_photo/{timestamp}`.
+        guard let data = photoData else { finish(); return }
+        uploads.uploadData(data: data, path: "product_photo/\(millis)", mimeType: "image/jpeg") { result in
+            switch result {
+            case .success(let url):
+                MarketplaceService.shared.postProduct(
+                    title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                    price: priceText.trimmingCharacters(in: .whitespacesAndNewlines),
+                    description: description.trimmingCharacters(in: .whitespacesAndNewlines),
+                    category: category,
+                    condition: condition,
+                    location: location.trimmingCharacters(in: .whitespacesAndNewlines),
+                    photoURL: url
+                )
+                isPublished = true
+            case .failure:
+                finish()
+            }
+        }
     }
 }
 

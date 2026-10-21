@@ -3,15 +3,33 @@ import SwiftUI
 // MARK: - Admin Moderation & Music Copyright Review View
 public struct AdminDashboardView: View {
     @ObservedObject private var theme = ThemeManager.shared
+    @ObservedObject private var firebaseService = FirebaseService.shared
     @Environment(\.presentationMode) var presentationMode
     
-    @State private var pendingSongs = [
-        SongReviewItem(id: "s1", title: "Sonata No. 1 en Sol Menor", artist: "Israel Violín", genre: "Clásica", timestamp: "Hace 1 hora"),
-        SongReviewItem(id: "s2", title: "El Son de la Madrugada", artist: "Mariachi Real", genre: "Mariachi", timestamp: "Hace 3 horas")
-    ]
+    /// Canciones descartadas a mano en modo demo (sin sesión no llega ningún snapshot
+    /// de RTDB, así que el "remove local" sigue siendo el único efecto).
+    @State private var locallyDismissedIds: Set<String> = []
+    /// Contadores locales de ejemplo (solo se usan cuando no hay sesión real).
     @State private var reportedPostsCount: Int = 4
     @State private var verificationRequestsCount: Int = 7
     @State private var selectedTab: Int = 0
+    
+    /// Cola de revisión derivada del catálogo YA sincronizado (`FirebaseService.songs`),
+    /// sin abrir ningún observador nuevo.
+    private var pendingSongs: [SongModel] {
+        firebaseService.songs.filter {
+            $0.normalizedVerificationStatus == "pending" && !locallyDismissedIds.contains($0.id)
+        }
+    }
+    
+    /// Contadores reales de RTDB (`ReportPost` y `Verification`); en modo demo, los locales.
+    private var reportedPostsLabel: String {
+        firebaseService.canWriteToCloud ? "\(firebaseService.adminReportedPostsCount)" : "\(reportedPostsCount)"
+    }
+    
+    private var verificationRequestsLabel: String {
+        firebaseService.canWriteToCloud ? "\(firebaseService.adminPendingVerificationsCount)" : "\(verificationRequestsCount)"
+    }
     
     public init() {}
     
@@ -25,14 +43,46 @@ public struct AdminDashboardView: View {
                         // Quick Stats Grid
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
                             AdminStatCard(title: "Revisión Canciones", count: "\(pendingSongs.count)", icon: "music.note.list", color: AppColors.primary)
-                            AdminStatCard(title: "Posts Reportados", count: "\(reportedPostsCount)", icon: "exclamationmark.triangle.fill", color: AppColors.errorRed)
-                            AdminStatCard(title: "Verificaciones", count: "\(verificationRequestsCount)", icon: "graduationcap.fill", color: AppColors.gold)
+                            AdminStatCard(title: "Posts Reportados", count: reportedPostsLabel, icon: "exclamationmark.triangle.fill", color: AppColors.errorRed)
+                            AdminStatCard(title: "Verificaciones", count: verificationRequestsLabel, icon: "graduationcap.fill", color: AppColors.gold)
                             AdminStatCard(title: "Pagos y Retiros", count: "$450 USD", icon: "dollarsign.circle.fill", color: AppColors.success)
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
                         
-                        // Music Copyright Review Queue
+                        // Gestor de Publicidad / Anuncios
+                        NavigationLink {
+                            AdsManagerView()
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: "megaphone.fill")
+                                    .font(.title3)
+                                    .foregroundColor(AppColors.gold)
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Gestor de Publicidad")
+                                        .font(.subheadline)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(theme.textPrimary)
+                                    Text("Campañas y anuncios promocionales")
+                                        .font(.caption2)
+                                        .foregroundColor(theme.textSecondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundColor(theme.textSecondary)
+                            }
+                            .padding(14)
+                            .background(theme.cardColor)
+                            .cornerRadius(16)
+                            .padding(.horizontal, 16)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        // Music Copyright Review Queue (nodo `Songs` de Android)
                         VStack(alignment: .leading, spacing: 14) {
                             Text("Revisión de Autoría de Canciones")
                                 .font(.headline)
@@ -54,23 +104,29 @@ public struct AdminDashboardView: View {
                                                     .fontWeight(.bold)
                                                     .foregroundColor(theme.textPrimary)
                                                 
-                                                Text("Por: \(song.artist) • \(song.genre)")
+                                                Text("Por: \(song.artist) • \(song.genre ?? "Sin género")")
                                                     .font(.caption)
                                                     .foregroundColor(theme.textSecondary)
+                                                
+                                                Text("Enviada el \(reviewDate(song.timestamp))")
+                                                    .font(.caption2)
+                                                    .foregroundColor(theme.textSecondary)
                                             }
-                                            
+                                             
                                             Spacer()
-                                            
-                                            Button(action: {}) {
+                                             
+                                            Button(action: {
+                                                AudioPlayerService.shared.playSong(song)
+                                            }) {
                                                 Image(systemName: "play.circle.fill")
                                                     .font(.title2)
                                                     .foregroundColor(AppColors.primary)
                                             }
                                         }
-                                        
+                                         
                                         HStack(spacing: 12) {
                                             Button(action: {
-                                                pendingSongs.removeAll(where: { $0.id == song.id })
+                                                moderate(song: song, approve: false)
                                             }) {
                                                 Text("Rechazar")
                                                     .font(.caption)
@@ -81,9 +137,9 @@ public struct AdminDashboardView: View {
                                                     .background(AppColors.errorRed.opacity(0.12))
                                                     .cornerRadius(10)
                                             }
-                                            
+                                             
                                             Button(action: {
-                                                pendingSongs.removeAll(where: { $0.id == song.id })
+                                                moderate(song: song, approve: true)
                                             }) {
                                                 Text("Aprobar Canción")
                                                     .font(.caption)
@@ -114,7 +170,33 @@ public struct AdminDashboardView: View {
                     Button("Cerrar") { presentationMode.wrappedValue.dismiss() }
                 }
             }
+            .onAppear {
+                // Contadores reales: `ReportPost` (denuncias) y `Verification` con status "pending".
+                firebaseService.refreshAdminCounters()
+            }
         }
+    }
+    
+    /// Aprueba / rechaza en `Songs/{songId}` con sesión real; en demo solo se oculta en local.
+    private func moderate(song: SongModel, approve: Bool) {
+        if firebaseService.canWriteToCloud {
+            if approve {
+                firebaseService.approveSong(songId: song.id)
+            } else {
+                firebaseService.rejectSong(songId: song.id)
+            }
+        } else {
+            locallyDismissedIds.insert(song.id)
+        }
+    }
+    
+    /// `timestamp` de Android (String con milisegundos) a fecha legible.
+    private func reviewDate(_ millis: String?) -> String {
+        guard let millis = millis, let value = Double(millis), value > 0 else { return "fecha no disponible" }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: Date(timeIntervalSince1970: value / 1000))
     }
 }
 
@@ -146,12 +228,4 @@ struct AdminStatCard: View {
         .background(theme.cardColor)
         .cornerRadius(16)
     }
-}
-
-struct SongReviewItem: Identifiable {
-    let id: String
-    let title: String
-    let artist: String
-    let genre: String
-    let timestamp: String
 }

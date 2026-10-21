@@ -12,6 +12,8 @@ public struct ChatModel: Identifiable, Codable, Hashable {
     public var isGroup: Bool?
     public var groupTitle: String?
     public var groupIcon: String?
+    /// `MutedChats/{miUid}/{userId}` — silenciado visto en la fila (AdapterChatList en Android).
+    public var isMuted: Bool?
     
     public init(
         id: String = UUID().uuidString,
@@ -24,7 +26,8 @@ public struct ChatModel: Identifiable, Codable, Hashable {
         isOnline: Bool? = false,
         isGroup: Bool? = false,
         groupTitle: String? = nil,
-        groupIcon: String? = nil
+        groupIcon: String? = nil,
+        isMuted: Bool? = nil
     ) {
         self.id = id
         self.userId = userId
@@ -37,6 +40,7 @@ public struct ChatModel: Identifiable, Codable, Hashable {
         self.isGroup = isGroup
         self.groupTitle = groupTitle
         self.groupIcon = groupIcon
+        self.isMuted = isMuted
     }
 }
 
@@ -52,8 +56,8 @@ public struct ChatMessageModel: Identifiable, Codable, Hashable {
     public var mediaUrl: String?
     public var voiceDuration: Double?
     public var waveform: [Float]?
-    public var splitSheet: SplitSheetAgreementModel?
-    public var proposal: JobProposalModel?
+    /// Reacciones en vivo: `Chats/{msgId}/reactions/{uid}` = emoji (AdapterChat.java).
+    public var reactions: [String: String]?
     
     public init(
         id: String = UUID().uuidString,
@@ -67,8 +71,7 @@ public struct ChatMessageModel: Identifiable, Codable, Hashable {
         mediaUrl: String? = nil,
         voiceDuration: Double? = nil,
         waveform: [Float]? = nil,
-        splitSheet: SplitSheetAgreementModel? = nil,
-        proposal: JobProposalModel? = nil
+        reactions: [String: String]? = nil
     ) {
         self.id = id
         self.messageId = messageId ?? id
@@ -81,11 +84,13 @@ public struct ChatMessageModel: Identifiable, Codable, Hashable {
         self.mediaUrl = mediaUrl
         self.voiceDuration = voiceDuration
         self.waveform = waveform
-        self.splitSheet = splitSheet
-        self.proposal = proposal
+        self.reactions = reactions
     }
 }
 
+/// Catálogo de tipos de mensaje — mantiene los rawValues del nodo `Chats.type` de Android
+/// (`ChatActivity.java`), incluyendo los alias legados ("doc") y los tipos enriquecidos.
+/// Los valores no reconocidos se decodifican como `.unknown` para no romper el hilo.
 public enum MessageType: String, Codable {
     case text
     case image
@@ -93,111 +98,70 @@ public enum MessageType: String, Codable {
     case video
     case sticker
     case document
+    case doc = "doc"
+    case location
+    case gif
+    case gift
     case callMissed = "missed_call"
-    case splitSheet = "split_sheet_agreement"
-    case proposal = "proposal"
-    case quote = "quote"
+    case voiceCall = "voice_call"
+    case audioCall = "audio_call"
+    case videoCall = "video_call"
+    case call = "call"
+    case jobProposal = "job_proposal"
     case sheetMusic = "sheet_music"
-    case song = "song"
-}
+    case song
+    case meet
+    case meeting
+    case meetingPresential = "meeting_presential"
+    case reel
+    case post
+    case unknown
 
-// MARK: - Split-Sheet Agreement Model (com.israviolink.app.chat.DialogSplitSheetCreator)
-public struct SplitSheetAgreementModel: Identifiable, Codable, Hashable {
-    public var id: String
-    public var agreementId: String
-    public var songTitle: String
-    public var genre: String
-    public var creatorId: String
-    public var creatorName: String
-    public var creatorRole: String
-    public var creatorPercentage: Int
-    public var creatorSigned: Bool
-    public var collaboratorId: String
-    public var collaboratorName: String
-    public var collaboratorRole: String
-    public var collaboratorPercentage: Int
-    public var collaboratorSigned: Bool
-    public var status: String // "pending", "signed", "rejected"
-    public var digitalCertificateHash: String
-    public var createdTimestamp: Double
-    
-    public init(
-        id: String = UUID().uuidString,
-        agreementId: String = UUID().uuidString,
-        songTitle: String = "",
-        genre: String = "Música",
-        creatorId: String = "",
-        creatorName: String = "",
-        creatorRole: String = "Compositor",
-        creatorPercentage: Int = 50,
-        creatorSigned: Bool = true,
-        collaboratorId: String = "",
-        collaboratorName: String = "",
-        collaboratorRole: String = "Co-autor",
-        collaboratorPercentage: Int = 50,
-        collaboratorSigned: Bool = false,
-        status: String = "pending",
-        digitalCertificateHash: String = "",
-        createdTimestamp: Double = Date().timeIntervalSince1970 * 1000
-    ) {
-        self.id = id
-        self.agreementId = agreementId
-        self.songTitle = songTitle
-        self.genre = genre
-        self.creatorId = creatorId
-        self.creatorName = creatorName
-        self.creatorRole = creatorRole
-        self.creatorPercentage = creatorPercentage
-        self.creatorSigned = creatorSigned
-        self.collaboratorId = collaboratorId
-        self.collaboratorName = collaboratorName
-        self.collaboratorRole = collaboratorRole
-        self.collaboratorPercentage = collaboratorPercentage
-        self.collaboratorSigned = collaboratorSigned
-        self.status = status
-        self.digitalCertificateHash = digitalCertificateHash
-        self.createdTimestamp = createdTimestamp
+    public init(from decoder: Decoder) throws {
+        let raw = (try? decoder.singleValueContainer().decode(String.self)) ?? ""
+        self = MessageType(rawValue: raw) ?? .unknown
+    }
+
+    /// Preview formateado del último mensaje para la bandeja (`AdapterChatList` en Android).
+    public var inboxPreviewLabel: String? {
+        switch self {
+        case .text, .unknown: return nil
+        case .image: return "📷 Foto"
+        case .video: return "🎥 Video"
+        case .audio: return "🎤 Audio"
+        case .doc, .document: return "📄 Documento"
+        case .location: return "📍 Ubicación"
+        case .sticker: return "Sticker"
+        case .gif: return "GIF"
+        case .gift: return "🎁 Regalo"
+        case .song: return "🎵 Canción"
+        case .sheetMusic: return "🎼 Partitura"
+        case .jobProposal: return "💼 Propuesta"
+        case .meet, .meeting, .meetingPresential: return "📹 Reunión"
+        case .reel: return "🎬 Reel"
+        case .post: return "📝 Publicación"
+        case .callMissed: return "📵 Llamada perdida"
+        case .voiceCall: return "📞 Llamada de voz"
+        case .audioCall: return "📞 Llamada de audio"
+        case .videoCall: return "📹 Videollamada"
+        case .call: return "📞 Llamada"
+        }
     }
 }
 
-// MARK: - Musical Job Proposal & Gig Contract Model
-public struct JobProposalModel: Identifiable, Codable, Hashable {
-    public var id: String
-    public var proposalId: String
-    public var jobRole: String
-    public var jobEvent: String
-    public var jobDate: String
-    public var jobLocation: String
-    public var jobPrice: Double
-    public var jobCurrency: String // "USD", "MXN", "QAV"
-    public var jobPaymentFrequency: String // "Por Servicio", "Por Hora"
-    public var jobStatus: String // "PENDING", "ACCEPTED", "REJECTED"
-    public var jobDetails: String?
-    
-    public init(
-        id: String = UUID().uuidString,
-        proposalId: String = UUID().uuidString,
-        jobRole: String = "Violinista Principal",
-        jobEvent: String = "Boda de Gala",
-        jobDate: String = "Próximo Sábado 19:00",
-        jobLocation: String = "Ciudad de México",
-        jobPrice: Double = 150.0,
-        jobCurrency: String = "USD",
-        jobPaymentFrequency: String = "Por Servicio",
-        jobStatus: String = "PENDING",
-        jobDetails: String? = nil
-    ) {
-        self.id = id
-        self.proposalId = proposalId
-        self.jobRole = jobRole
-        self.jobEvent = jobEvent
-        self.jobDate = jobDate
-        self.jobLocation = jobLocation
-        self.jobPrice = jobPrice
-        self.jobCurrency = jobCurrency
-        self.jobPaymentFrequency = jobPaymentFrequency
-        self.jobStatus = jobStatus
-        self.jobDetails = jobDetails
+public extension ChatMessageModel {
+    /// Reacciones agrupadas por emoji, como `AdapterChat.java` (161-176): cuenta
+    /// `reactions.values()` y pinta "emoji n". Orden estable: primero las más votadas.
+    var groupedReactions: [(emoji: String, count: Int)] {
+        guard let reactions = reactions, !reactions.isEmpty else { return [] }
+        var counts: [String: Int] = [:]
+        for emoji in reactions.values {
+            counts[emoji, default: 0] += 1
+        }
+        return counts
+            .map { (emoji: $0.key, count: $0.value) }
+            .sorted { lhs, rhs in
+                lhs.count == rhs.count ? lhs.emoji < rhs.emoji : lhs.count > rhs.count
+            }
     }
 }
-

@@ -7,25 +7,47 @@ public struct PostCardView: View {
     public var onLike: () -> Void
     public var onComment: () -> Void
     public var onShare: () -> Void
+    public var canOpenDetail: Bool = true
     
     @ObservedObject private var theme = ThemeManager.shared
     @State private var isLikedLocal: Bool = false
     @State private var likesCountLocal: Int = 0
     @State private var isPlayingAudioSnippet: Bool = false
+    @State private var isDetailPresented: Bool = false
+    @State private var isMediaPresented: Bool = false
     private let audioPlayer = AudioPlayerService.shared
     
     public init(
         post: PostModel,
         onLike: @escaping () -> Void = {},
         onComment: @escaping () -> Void = {},
-        onShare: @escaping () -> Void = {}
+        onShare: @escaping () -> Void = {},
+        canOpenDetail: Bool = true
     ) {
         self.post = post
         self.onLike = onLike
         self.onComment = onComment
         self.onShare = onShare
+        self.canOpenDetail = canOpenDetail
         _isLikedLocal = State(initialValue: post.likedByCurrentUser ?? false)
         _likesCountLocal = State(initialValue: Int(post.pLikes ?? "0") ?? 0)
+    }
+    
+    // MARK: - Media helpers (image / video full screen preview)
+    private func isVideoUrl(_ string: String) -> Bool {
+        let lower = string.lowercased()
+        return lower.hasSuffix(".mp4") || lower.hasSuffix(".mov") || lower.hasSuffix(".m3u8")
+    }
+    
+    private var mediaUrlToShow: String? {
+        if let image = post.pImage, !image.isEmpty { return image }
+        if let video = post.pVideo, !video.isEmpty { return video }
+        return nil
+    }
+    
+    private var mediaIsVideo: Bool {
+        guard let url = mediaUrlToShow else { return false }
+        return isVideoUrl(url)
     }
     
     public var body: some View {
@@ -77,6 +99,11 @@ public struct PostCardView: View {
                     .font(.body)
                     .fontWeight(.semibold)
                     .foregroundColor(theme.textPrimary)
+                    .onTapGesture {
+                        if canOpenDetail {
+                            isDetailPresented = true
+                        }
+                    }
             }
             
             if let descr = post.pDescr, !descr.isEmpty {
@@ -111,6 +138,12 @@ public struct PostCardView: View {
                             .frame(height: 220)
                             .cornerRadius(12)
                     }
+                }
+                .onTapGesture {
+                    isMediaPresented = true
+                }
+                .fullScreenCover(isPresented: $isMediaPresented) {
+                    MediaViewerModal(mediaUrl: mediaUrlToShow ?? "", isVideo: mediaIsVideo)
                 }
             }
             
@@ -164,8 +197,13 @@ public struct PostCardView: View {
                     }
                 }
                 
-                // Comment Button
-                Button(action: onComment) {
+                // Comment Button (opens the post detail & comment thread)
+                Button(action: {
+                    onComment()
+                    if canOpenDetail {
+                        isDetailPresented = true
+                    }
+                }) {
                     HStack(spacing: 6) {
                         Image(systemName: "bubble.right")
                             .foregroundColor(theme.textSecondary)
@@ -198,6 +236,9 @@ public struct PostCardView: View {
         .background(theme.cardColor)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 3)
+        .fullScreenCover(isPresented: $isDetailPresented) {
+            DetailPostView(post: post)
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 // MARK: - Bottom Sheet Creation Options Modal
 public struct CreateModalSheet: View {
@@ -139,15 +140,21 @@ struct CreateOptionItem: View {
 public struct CreatePostView: View {
     @ObservedObject private var theme = ThemeManager.shared
     @ObservedObject private var firebaseService = FirebaseService.shared
+    @ObservedObject private var uploads = UploadManager.shared
     @Environment(\.presentationMode) var presentationMode
     
     @State private var postTitle: String = ""
     @State private var postDescription: String = ""
     @State private var selectedFeeling: String = "Inspirado"
     @State private var selectedLocation: String = "Ciudad de México"
+    @State private var pickedPhoto: PhotosPickerItem? = nil
+    @State private var pickedPhotoData: Data? = nil
+    @State private var isPublishing: Bool = false
     
     let feelings = ["Inspirado", "Feliz", "Practicando", "En Concierto", "En Estudio", "Emocionado"]
-    
+
+    public init() {}
+
     public var body: some View {
         NavigationView {
             ZStack {
@@ -203,11 +210,11 @@ public struct CreatePostView: View {
                     
                     // Attachment Actions
                     HStack(spacing: 16) {
-                        Button(action: {}) {
+                        PhotosPicker(selection: $pickedPhoto, matching: .images) {
                             HStack(spacing: 6) {
-                                Image(systemName: "photo.fill")
+                                Image(systemName: pickedPhotoData == nil ? "photo.fill" : "checkmark.circle.fill")
                                     .foregroundColor(AppColors.success)
-                                Text("Foto")
+                                Text(pickedPhotoData == nil ? "Foto" : "Foto lista")
                                     .font(.subheadline)
                                     .foregroundColor(theme.textPrimary)
                             }
@@ -249,27 +256,25 @@ public struct CreatePostView: View {
                     
                     Spacer()
                     
-                    Button(action: {
-                        firebaseService.createPost(
-                            title: postTitle,
-                            description: postDescription,
-                            feeling: selectedFeeling,
-                            image: "https://images.unsplash.com/photo-1612225330812-01a9c6b355ec?w=800&auto=format&fit=crop&q=60",
-                            video: nil,
-                            audio: nil
-                        )
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Text("Publicar en PROVIWEB")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(AppColors.primary)
-                            .cornerRadius(16)
-                            .shadow(color: AppColors.primary.opacity(0.4), radius: 8, x: 0, y: 4)
+                    Button(action: publishPost) {
+                        HStack(spacing: 8) {
+                            if isPublishing {
+                                ProgressView().tint(.white)
+                                Text("Publicando...")
+                            } else {
+                                Text("Publicar en PROVIWEB")
+                            }
+                        }
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(AppColors.primary)
+                        .cornerRadius(16)
+                        .shadow(color: AppColors.primary.opacity(0.4), radius: 8, x: 0, y: 4)
                     }
+                    .disabled(isPublishing)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 24)
                 }
@@ -279,6 +284,47 @@ public struct CreatePostView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") { presentationMode.wrappedValue.dismiss() }
+                }
+            }
+            .onChange(of: pickedPhoto) { item in
+                guard let item = item else { return }
+                Task {
+                    pickedPhotoData = try? await item.loadTransferable(type: Data.self)
+                }
+            }
+        }
+    }
+    
+    /// Primero sube la foto a Storage (`post_photo/{millis}`, igual que CreatePostPagesActivity.java
+    /// en Android) y luego crea el post con la URL descargada; sin foto crea un post de texto.
+    private func publishPost() {
+        isPublishing = true
+        let finishPublishing: (String?) -> Void = { [postTitle, postDescription, selectedFeeling] imageURL in
+            firebaseService.createPost(
+                title: postTitle,
+                description: postDescription,
+                feeling: selectedFeeling,
+                image: imageURL,
+                video: nil,
+                audio: nil
+            )
+            isPublishing = false
+            presentationMode.wrappedValue.dismiss()
+        }
+        
+        guard let data = pickedPhotoData else {
+            finishPublishing(nil)
+            return
+        }
+        let millis = "\(Int(Date().timeIntervalSince1970 * 1000))"
+        uploads.uploadData(data: data, path: "post_photo/\(millis)", mimeType: "image/jpeg") { result in
+            switch result {
+            case .success(let url):
+                finishPublishing(url)
+            case .failure(let error):
+                Task { @MainActor in
+                    firebaseService.authError = "No se pudo subir la foto: \(error.localizedDescription)"
+                    isPublishing = false
                 }
             }
         }

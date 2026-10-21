@@ -6,7 +6,10 @@ public struct ReelsView: View {
     @StateObject private var viewModel = ReelsViewModel()
     @State private var showHeartBurst: Bool = false
     @State private var heartBurstPosition: CGPoint = .zero
-    
+    @State private var isSeriesPresented: Bool = false
+
+    public init() {}
+
     public var body: some View {
         ZStack {
             Color.black
@@ -46,6 +49,34 @@ public struct ReelsView: View {
                     .scaleEffect(showHeartBurst ? 1.2 : 0.2)
                     .opacity(showHeartBurst ? 1.0 : 0.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.4), value: showHeartBurst)
+            }
+            
+            // Video Series Entry (cabecera del feed de reels)
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: { isSeriesPresented = true }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "play.rectangle.fill")
+                                .font(.caption)
+                            Text("Series")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.white.opacity(0.18))
+                        .cornerRadius(16)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                
+                Spacer()
+            }
+            .sheet(isPresented: $isSeriesPresented) {
+                VideoSeriesPlayerView()
             }
         }
         .sheet(isPresented: $viewModel.isCommentsSheetPresented) {

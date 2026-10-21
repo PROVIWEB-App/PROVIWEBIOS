@@ -97,9 +97,32 @@ public struct MusicExploreView: View {
                                 .foregroundColor(theme.textPrimary)
                                 .padding(.horizontal, 16)
                             
-                            ForEach(firebaseService.songs) { song in
-                                SongExploreRow(song: song) {
-                                    player.playSong(song)
+                            if firebaseService.songs.isEmpty {
+                                VStack(spacing: 8) {
+                                    Image(systemName: "music.note.list")
+                                        .font(.title)
+                                        .foregroundColor(theme.textSecondary)
+                                    
+                                    Text("Aún no hay canciones publicadas.")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(theme.textPrimary)
+                                    
+                                    Text("Las pistas que suban los artistas aparecerán aquí cuando el equipo de revisión las apruebe.")
+                                        .font(.caption)
+                                        .foregroundColor(theme.textSecondary)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 28)
+                                .padding(.horizontal, 16)
+                            } else {
+                                ForEach(firebaseService.songs) { song in
+                                    SongExploreRow(song: song) {
+                                        player.playSong(song)
+                                        // Contador `playCount` (mismo nodo que consulta Android)
+                                        firebaseService.registerSongPlay(songId: song.id)
+                                    }
                                 }
                             }
                         }
@@ -169,37 +192,45 @@ struct SongExploreRow: View {
                     .font(.caption2)
                     .foregroundColor(AppColors.primary)
                 
-                Text("\(song.plays ?? 0) reproducciones")
+                Text("\(song.totalPlays) reproducciones")
                     .font(.system(size: 10))
                     .foregroundColor(theme.textSecondary)
+                
+                verificationBadge
             }
         }
         .padding(12)
         .background(theme.cardColor)
         .cornerRadius(16)
     }
+    
+    /// Estado de moderación de la canción (mismos valores que ModelSong.java).
+    @ViewBuilder private var verificationBadge: some View {
+        switch song.normalizedVerificationStatus {
+        case "approved":
+            Label("Aprobada", systemImage: "checkmark.seal.fill")
+                .font(.system(size: 9))
+                .foregroundColor(AppColors.success)
+        case "rejected":
+            Label("Rechazada", systemImage: "xmark.seal.fill")
+                .font(.system(size: 9))
+                .foregroundColor(AppColors.errorRed)
+        default:
+            Label("En revisión", systemImage: "clock.fill")
+                .font(.system(size: 9))
+                .foregroundColor(AppColors.gold)
+        }
+    }
 }
 
-// MARK: - Upload Song & Music Asset View (UploadSongActivity & CreateMusicAssetActivity 100% equivalent)
+// MARK: - Upload Song View
 struct UploadSongView: View {
     @ObservedObject private var theme = ThemeManager.shared
-    @ObservedObject private var firebaseService = FirebaseService.shared
     @Environment(\.presentationMode) var presentationMode
-    
     @State private var songTitle: String = ""
-    @State private var albumTitle: String = ""
     @State private var genre: String = "Clásica"
-    @State private var musicalKey: String = "Sol Mayor (G)"
-    @State private var bpm: Double = 120.0
-    @State private var lyrics: String = ""
-    @State private var isPodcast: Bool = false
-    @State private var podcastCategory: String = "Educación Musical"
     @State private var isOwnSongConfirmed: Bool = true
-    @State private var isAudioSelected: Bool = false
-    @State private var generatedSHA256Hash: String = ""
     @State private var isSuccess: Bool = false
-    
-    let keys = ["Do Mayor (C)", "Sol Mayor (G)", "Re Mayor (D)", "La Mayor (A)", "Mi Mayor (E)", "Fa Mayor (F)", "La Menor (Am)", "Mi Menor (Em)", "Re Menor (Dm)"]
     
     var body: some View {
         NavigationView {
@@ -207,113 +238,44 @@ struct UploadSongView: View {
                 theme.backgroundColor.ignoresSafeArea()
                 
                 Form {
-                    Section(header: Text("Información de la Obra o Canción")) {
+                    Section(header: Text("Información de la Canción")) {
                         TextField("Título de la obra o canción", text: $songTitle)
-                        TextField("Álbum o Suite (Opcional)", text: $albumTitle)
-                        
                         Picker("Género Musical", selection: $genre) {
                             Text("Música Clásica").tag("Clásica")
                             Text("Mariachi").tag("Mariachi")
                             Text("Banda Sinaloense").tag("Banda")
                             Text("Jazz").tag("Jazz")
                             Text("Vocal / Canto").tag("Vocal")
-                            Text("Sinfónica / Banda").tag("Sinfónica")
                         }
                     }
                     
-                    Section(header: Text("Parámetros Musicales & OMR")) {
-                        Picker("Tonalidad", selection: $musicalKey) {
-                            ForEach(keys, id: \.self) { k in
-                                Text(k).tag(k)
-                            }
-                        }
-                        
-                        HStack {
-                            Text("Tempo:")
-                            Spacer()
-                            Text("\(Int(bpm)) BPM")
-                                .fontWeight(.bold)
-                                .foregroundColor(AppColors.primary)
-                        }
-                        Slider(value: $bpm, in: 40...220, step: 1)
-                    }
-                    
-                    Section(header: Text("Archivo de Audio & Huella Digital")) {
-                        Button(action: {
-                            isAudioSelected = true
-                            // Compute simulated SHA-256 fingerprint from binary
-                            let raw = "\(songTitle)-\(Date().timeIntervalSince1970)-\(firebaseService.currentUserId)"
-                            generatedSHA256Hash = raw.data(using: .utf8)?.base64EncodedString() ?? UUID().uuidString
-                        }) {
+                    Section(header: Text("Archivo de Audio")) {
+                        Button(action: {}) {
                             HStack {
-                                Image(systemName: isAudioSelected ? "checkmark.circle.fill" : "waveform.circle.fill")
-                                    .foregroundColor(isAudioSelected ? AppColors.success : AppColors.primary)
-                                Text(isAudioSelected ? "audio_master_48khz.wav cargado" : "Seleccionar Archivo (MP3 / WAV)")
-                                    .foregroundColor(theme.textPrimary)
-                            }
-                        }
-                        
-                        if isAudioSelected {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Huella Criptográfica SHA-256 (audio_ownership):")
-                                    .font(.caption2)
-                                    .foregroundColor(theme.textSecondary)
-                                Text(generatedSHA256Hash.prefix(32) + "...")
-                                    .font(.system(size: 10, design: .monospaced))
+                                Image(systemName: "waveform.circle.fill")
                                     .foregroundColor(AppColors.primary)
+                                Text("Seleccionar Archivo (MP3 / WAV)")
                             }
                         }
                     }
                     
-                    Section(header: Text("Letras Sincronizadas / Notas")) {
-                        TextEditor(text: $lyrics)
-                            .frame(height: 70)
-                    }
-                    
-                    Section(header: Text("Formato Podcast / Entrevista")) {
-                        Toggle("¿Es un episodio de Podcast?", isOn: $isPodcast)
-                        if isPodcast {
-                            TextField("Categoría del Podcast", text: $podcastCategory)
-                        }
-                    }
-                    
-                    Section(header: Text("Propiedad Intelectual")) {
-                        Toggle("Declaro bajo protesta de decir verdad que soy el titular o cuento con la licencia legítima de esta obra", isOn: $isOwnSongConfirmed)
+                    Section(header: Text("Verificación de Autoría")) {
+                        Toggle("Declaro que soy el autor o cuento con los derechos de esta grabación", isOn: $isOwnSongConfirmed)
                     }
                     
                     Button(action: {
-                        guard !songTitle.isEmpty else { return }
-                        let newSong = SongModel(
-                            id: UUID().uuidString,
-                            title: songTitle,
-                            artist: firebaseService.currentUser?.name ?? "Israel Violín",
-                            artistId: firebaseService.currentUserId,
-                            audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-                            coverUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500",
-                            genre: genre,
-                            duration: 240,
-                            plays: 0,
-                            isVerifiedAuthor: true,
-                            isPendingReview: false
-                        )
-                        firebaseService.songs.insert(newSong, at: 0)
                         isSuccess = true
                     }) {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "cloud.fill")
-                            Text("Publicar Obra en Ecosistema")
-                                .fontWeight(.bold)
-                            Spacer()
-                        }
-                        .foregroundColor(.white)
-                        .padding(.vertical, 6)
+                        Text("Subir a PROVIWEB")
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
                     }
                     .listRowBackground(AppColors.primary)
-                    .disabled(songTitle.isEmpty || !isOwnSongConfirmed)
                 }
             }
-            .navigationTitle("Publicar Música / Asset")
+            .navigationTitle("Subir Canción")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -321,13 +283,9 @@ struct UploadSongView: View {
                 }
             }
             .alert(isPresented: $isSuccess) {
-                Alert(
-                    title: Text("¡Obra Publicada y Protegida! 🎵"),
-                    message: Text("Tu canción ha sido registrada con huella digital SHA-256 en la red PROVIWEB."),
-                    dismissButton: .default(Text("Aceptar")) {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                )
+                Alert(title: Text("Canción Enviada"), message: Text("Tu pista se ha subido y pasará por revisión de derechos."), dismissButton: .default(Text("OK")) {
+                    presentationMode.wrappedValue.dismiss()
+                })
             }
         }
     }
