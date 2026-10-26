@@ -110,6 +110,37 @@ PROVIWEBIOS/
 
 ---
 
+## ⬇️ Descarga rápida y prueba (para usuarios)
+
+Hay dos formas de probar PROVIWEB iOS:
+
+### Opción A — Abrir el proyecto en Xcode (recomendada para desarrollo)
+1. Descarga el repo (botón **Code → Download ZIP**) o clónalo:
+   ```bash
+   git clone https://github.com/PROVIWEB-App/PROVIWEBIOS.git
+   ```
+2. Abre **`PROVIWEB.xcodeproj`** (no la carpeta, el archivo `.xcodeproj`).
+3. Xcode resolverá solo los paquetes de **Firebase iOS SDK** vía SPM (requiere internet la primera vez).
+4. Elige un **simulador** (ej. *iPhone 16*) o un iPhone físico.
+5. **Cmd + R** para compilar y lanzar. ✅
+
+> **Simulador:** no requiere ninguna configuración de firma.  
+> **Dispositivo físico:** en *Signing & Capsules* selecciona tu *Team* de Apple Developer (Xcode firma automática). Sin Team, el build a dispositivo falla — es un límite de Apple, no del proyecto.
+
+### Opción B — Instalar el `.ipa` de pruebas (sin Mac ni Xcode)
+1. En la pestaña **Actions** del repo, abre el workflow **Build & Distribute PROVIWEB iOS IPA**.
+2. Descarga el artefacto **`PROVIWEB-IPA`** (o el build de simulador **`PROVIWEB-Simulator-Appetize`** para Appetize.io).
+3. Si el pipeline tiene `FIREBASE_TOKEN` configurado, la build también llega sola a **Firebase App Distribution** (grupos `testers`, `qa-team`) y los testers reciben el link por correo.
+
+> ⚠️ Estas builds de prueba se re-firman con certificado de Firebase: **funciona todo salvo push notifications (APNs)**. Para producción con push real, firma el equipo humano (ver `RELEASE_CHECKLIST.md`).
+
+### Requisitos
+- **Xcode 15 o superior** (probado con Xcode 16.2).
+- **iOS 16.0+** (simulador o dispositivo).
+- Cuenta de Firebase ya configurada (`PROVIWEB/Config/GoogleService-Info.plist` incluido).
+
+---
+
 ## 🛠️ Cómo compilar y ejecutar en Xcode
 
 1. Abre `PROVIWEB.xcodeproj` en **Xcode 15 o superior**.
